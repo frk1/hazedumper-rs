@@ -1,0 +1,11 @@
+[package]
+authors = ["frk <hazefrk+dev@gmail.com>"]
+name = "memlib"
+version = "0.2.0"
+
+[dependencies]
+num = "0.1"
+regex = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt"] }
