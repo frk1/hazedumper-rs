@@ -16,9 +16,10 @@ extern crate structopt_derive;
 mod config;
 mod games;
 mod memlib;
+mod output;
 mod sigscan;
 
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::fs::OpenOptions;
 use std::process::exit;
 
@@ -26,7 +27,7 @@ use config::Config;
 use simplelog::*;
 use structopt::StructOpt;
 
-type Map<T> = HashMap<String, T>;
+type Map<T> = BTreeMap<String, T>;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "hazedumper", about = "Signature scanning for every game!", version = "2.0.0",
@@ -39,6 +40,10 @@ struct Opt {
     /// Optional parameter, the config file.
     #[structopt(help = "Path to the config file (default: config.json)")]
     config: Option<String>,
+
+    /// Optional parameter, the config file.
+    #[structopt(help = "Output filename")]
+    filename: Option<String>,
 
     /// Optional parameter, overrides the target executable.
     #[structopt(short = "t", long = "target", help = "Target executable")]
@@ -70,6 +75,10 @@ fn main() {
         "csgo.exe" => scan_netvars(&sigs, &conf, &process),
         _ => None,
     };
+
+    let results = output::Results::new(sigs, netvars);
+    let filename = opt.filename.unwrap_or("csgo".to_string());
+    results.dump(&filename).expect("Dump results");
 }
 
 fn setup_log(v: u64) -> () {
@@ -90,13 +99,13 @@ fn setup_log(v: u64) -> () {
     ]).unwrap();
 }
 
-// Scan the signatures from the config and return a `HashMap`.
+// Scan the signatures from the config and return a `Map<usize>`.
 fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     info!(
         "Starting signature scanning: {} items",
         conf.signatures.len()
     );
-    let mut res = HashMap::new();
+    let mut res = BTreeMap::new();
 
     for (_, sig) in conf.signatures.iter().enumerate() {
         match sigscan::find_signature32(sig, &process) {
@@ -116,18 +125,18 @@ fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     res
 }
 
-// Scan the netvars from the config and return a `HashMap`.
-fn scan_netvars(sigs: &Map<usize>, conf: &Config, process: &memlib::Process) -> Option<Map<i32>> {
+// Scan the netvars from the config and return a `Option<Map<i32>>`.
+fn scan_netvars(sigs: &Map<usize>, conf: &Config, process: &memlib::Process) -> Option<Map<isize>> {
     info!("Starting netvar scanning: {} items", conf.netvars.len());
 
     let first = sigs.get("dwGetAllClasses")?;
     let netvars = games::csgo::NetvarManager::new(first.clone(), process)?;
 
-    let mut res = HashMap::new();
+    let mut res = BTreeMap::new();
     for (_, netvar) in conf.netvars.iter().enumerate() {
         match netvars.get_offset(&netvar.table, &netvar.prop) {
             Some(o) => {
-                res.insert(netvar.name.clone(), o);
+                res.insert(netvar.name.clone(), o as isize + netvar.offset);
                 info!("Found netvar: {} => 0x{:X}", netvar.name, o);
             }
             None => warn!("{} netvar failed!", netvar.name),

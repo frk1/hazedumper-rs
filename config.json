@@ -1,6 +1,7 @@
 {
   "executable": "csgo.exe",
   "bitness": "X86",
+  "filename": "csgo",
   "signatures": [
     {
       "name": "dwClientState",

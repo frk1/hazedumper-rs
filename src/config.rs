@@ -101,6 +101,10 @@ pub struct Config {
     #[serde(default)]
     pub bitness: Bitness,
 
+    // Output file names
+    #[serde(default)]
+    pub filename: String,
+
     // `Vec` containing the `Signature`s.
     #[serde(default)]
     pub signatures: Vec<Signature>,
@@ -115,6 +119,7 @@ impl Default for Config {
         Config {
             executable: "csgo.exe".to_string(),
             bitness: Bitness::X86,
+            filename: "csgo".to_string(),
             signatures: vec![],
             netvars: vec![],
         }

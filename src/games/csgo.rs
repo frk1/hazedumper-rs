@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::str;
 
 use memlib::{Module, Process};
@@ -27,7 +27,7 @@ pub struct RecvProp {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetvarManager {
-    tables: HashMap<String, RecvTable>,
+    tables: BTreeMap<String, RecvTable>,
 }
 
 named!(
@@ -206,7 +206,7 @@ impl NetvarManager {
         debug!("First ClientClass at 0x{:X}", first);
 
         let mut cc_opt = ClientClass::new(first + module.base, &module);
-        let mut tables = HashMap::new();
+        let mut tables = BTreeMap::new();
 
         while let Some(cc) = cc_opt {
             if let &Some(ref table) = &cc.table {
