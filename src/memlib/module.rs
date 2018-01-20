@@ -60,6 +60,28 @@ impl Module {
     pub fn find_pattern(&self, pattern: &str) -> Option<usize> {
         findpattern::find_pattern(&self.data, pattern)
     }
+
+    // o: Offset
+    // is_relative: Base has already been subtracted.
+    pub fn get_raw<T: Copy>(&self, mut o: usize, is_relative: bool) -> Option<T> {
+        if !is_relative {
+            o -= self.base;
+        }
+        if o + mem::size_of::<T>() >= self.data.len() {
+            return None;
+        }
+        let ptr = self.data.get(o)?;
+        let raw: T = unsafe { mem::transmute_copy(ptr) };
+        Some(raw)
+    }
+
+    // is_relative: if true, the base has already been subtracted.
+    pub fn get_slice(&self, mut offset: usize, len: usize, is_relative: bool) -> Option<&[u8]> {
+        if !is_relative {
+            offset -= self.base;
+        }
+        self.data.get(offset..(offset + len))
+    }
 }
 
 /// Wrapper around the `Module32FirstW` windows api

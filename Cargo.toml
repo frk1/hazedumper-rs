@@ -15,6 +15,7 @@ simplelog = "0.4.4"
 failure = "0.1.1"
 regex = "0.2.5"
 num = "0.1.41"
+nom = "4.0.0-alpha2"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt"] }

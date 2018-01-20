@@ -2,6 +2,8 @@
 extern crate failure;
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate nom;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -12,10 +14,11 @@ extern crate structopt;
 extern crate structopt_derive;
 
 mod config;
-mod netvars;
+mod games;
 mod memlib;
 mod sigscan;
 
+use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::process::exit;
 
@@ -44,6 +47,28 @@ struct Opt {
     bitness: Option<config::Bitness>,
 }
 
+fn main() {
+    let opt = Opt::from_args();
+    setup_log(opt.verbose);
+
+    info!("Loading config");
+    let conf = Config::load(&opt.config.unwrap_or_else(|| "config.json".to_string()))
+        .unwrap_or_else(|_| Config::default());
+
+    info!("Opening target process: {}", conf.executable);
+    let process = memlib::from_name(&conf.executable)
+        .ok_or_else(|| {
+            error!("Could not open process {}!", conf.executable);
+            exit(1);
+        })
+        .unwrap();
+
+    let sigs = scan_signatures(&conf, &process);
+    if let Some(first) = sigs.get("dwGetAllClasses") {
+        games::csgo::test(first.clone(), &process);
+    }
+}
+
 fn setup_log(v: u64) -> () {
     let level = match v {
         0 => LogLevelFilter::Info,
@@ -61,25 +86,26 @@ fn setup_log(v: u64) -> () {
     ]).unwrap();
 }
 
-fn main() {
-    let opt = Opt::from_args();
-    setup_log(opt.verbose);
-
-    info!("Loading config");
-    let conf = Config::load(&opt.config.unwrap_or_else(|| "config.json".to_string()))
-        .unwrap_or_else(|_| Config::default());
-
-    info!("Opening target process: {}", conf.executable);
-    let process = memlib::from_name(&conf.executable)
-        .ok_or_else(|| {
-            error!("Could not open process {}!", conf.executable);
-            exit(1);
-        })
-        .unwrap();
+// Scan the signatures from the config and return a `HashMap`.
+fn scan_signatures(conf: &Config, process: &memlib::Process) -> HashMap<String, usize> {
+    info!(
+        "Starting signature scanning: {} items",
+        conf.signatures.len()
+    );
+    let mut res = HashMap::new();
 
     for (_, sig) in conf.signatures.iter().enumerate() {
-        if let Err(err) = sigscan::find_signature32(sig, &process) {
-            warn!("{} sigscan failed: {}", sig.name, err);
-        }
+        match sigscan::find_signature32(sig, &process) {
+            Ok(r) => {
+                res.insert(sig.name.clone(), r);
+            }
+            Err(err) => warn!("{} sigscan failed: {}", sig.name, err),
+        };
     }
+
+    info!(
+        "Finished signature scanning: {} items successful",
+        res.len()
+    );
+    res
 }
