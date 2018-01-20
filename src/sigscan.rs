@@ -20,22 +20,20 @@ pub enum ScanError {
 
 pub fn find_signature32(sig: &Signature, process: &Process) -> Result<usize> {
     debug!("Begin scan: {}", sig.name);
-    debug!("Load module {}", sig.module);
 
+    debug!("Load module {}", sig.module);
     let module = process
         .get_module(&sig.module)
         .ok_or(ScanError::ModuleNotFound)?;
-
     debug!(
         "Module found: {} - Base: 0x{:X} Size: 0x{:X}",
         module.name, module.base, module.size
     );
-    debug!("Searching pattern: {}", sig.pattern);
 
+    debug!("Searching pattern: {}", sig.pattern);
     let mut addr = module
         .find_pattern(&sig.pattern)
         .ok_or(ScanError::PatternNotFound)?;
-
     debug!("Pattern found at: 0x{:X}", addr);
 
     for (i, o) in sig.offsets.iter().enumerate() {

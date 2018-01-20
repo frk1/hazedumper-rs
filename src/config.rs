@@ -36,26 +36,6 @@ pub struct Signature {
     pub relative: bool,
 }
 
-impl Signature {
-    pub fn new(
-        name: &str,
-        pattern: &str,
-        module: &str,
-        offsets: Vec<isize>,
-        extra: isize,
-        relative: bool,
-    ) -> Self {
-        Signature {
-            name: name.to_string(),
-            pattern: pattern.to_string(),
-            module: module.to_string(),
-            offsets: offsets,
-            extra: extra,
-            relative: relative,
-        }
-    }
-}
-
 impl Default for Signature {
     fn default() -> Self {
         Signature {

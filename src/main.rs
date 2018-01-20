@@ -66,7 +66,7 @@ fn main() {
     setup_log(opt.verbose);
 
     info!("Loading config");
-    let conf = Config::load(&opt.config.unwrap_or("config.json".to_string()))
+    let conf = Config::load(&opt.config.unwrap_or_else(|| "config.json".to_string()))
         .unwrap_or_else(|_| Config::default());
 
     info!("Opening target process: {}", conf.executable);
@@ -77,8 +77,8 @@ fn main() {
         })
         .unwrap();
 
-    for (i, sig) in conf.signatures.iter().enumerate() {
-        if let Err(err) = sigscan::find_signature32(&sig, &process) {
+    for (_, sig) in conf.signatures.iter().enumerate() {
+        if let Err(err) = sigscan::find_signature32(sig, &process) {
             warn!("{} sigscan failed: {}", sig.name, err);
         }
     }
