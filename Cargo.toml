@@ -1,0 +1,20 @@
+[package]
+name = "hazedumper-rs-new"
+version = "2.0.0"
+authors = ["frk <hazefrk+dev@gmail.com>"]
+
+[dependencies]
+serde = "1.0.27"
+serde_json = "1.0.9"
+serde_derive = "1.0.27"
+structopt = "0.1.6"
+structopt-derive = "0.1.6"
+winapi = "0.3.4"
+log = "0.4.1"
+simplelog = "0.4.4"
+failure = "0.1.1"
+regex = "0.2.5"
+num = "0.1.41"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt"] }
