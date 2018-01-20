@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+use std::str;
+
 use memlib::{Module, Process};
 use nom::*;
-use std::str;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClientClass {
@@ -22,6 +24,11 @@ pub struct RecvProp {
     pub table: Option<RecvTable>, // pDataTable at 0x28
     pub offset: i32,
 } // Size: 0x3C
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct NetvarManager {
+    tables: HashMap<String, RecvTable>,
+}
 
 named!(
     parse_cstring<&str>,
@@ -46,18 +53,22 @@ impl ClientClass {
             return None;
         }
 
-        debug!("Starting to parse ClientClass at 0x{:X}", base);
+        trace!("Starting to parse ClientClass at 0x{:X}", base);
         let (pname, ptable, pnext, id) = ClientClass::parse(module.get_slice(base, 0x18, false)?)
             .ok()?
             .1;
-        debug!(
+        trace!(
             "ClientClass at 0x{:X} => name 0x{:X}, table 0x{:X}, next 0x{:X}, id 0x{:X}",
-            base, pname, ptable, pnext, id
+            base,
+            pname,
+            ptable,
+            pnext,
+            id
         );
         let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
             .ok()?
             .1;
-        debug!("ClientClass at 0x{:X} => {}", base, name);
+        trace!("ClientClass at 0x{:X} => {}", base, name);
 
         let table = RecvTable::new(ptable as usize, module);
         let next = match pnext {
@@ -91,18 +102,21 @@ impl RecvTable {
             return None;
         }
 
-        debug!("Starting to parse RecvTable at 0x{:X}", base);
+        trace!("Starting to parse RecvTable at 0x{:X}", base);
         let (props, numprops, pname) = RecvTable::parse(module.get_slice(base, 0x10, false)?)
             .ok()?
             .1;
-        debug!(
+        trace!(
             "RecvTable at 0x{:X} => name 0x{:X}, props 0x{:X}, numprops 0x{:X}",
-            base, pname, props, numprops
+            base,
+            pname,
+            props,
+            numprops
         );
         let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
             .ok()?
             .1;
-        debug!("RecvTable at 0x{:X} => {}", base, name);
+        trace!("RecvTable at 0x{:X} => {}", base, name);
 
         let mut vec_props = vec![];
         for i in 0..numprops {
@@ -116,6 +130,15 @@ impl RecvTable {
             name: name.to_string(),
             props: vec_props,
         })
+    }
+
+    pub fn get_offset(&self, netvar_name: &str) -> Option<i32> {
+        for prop in self.props.iter() {
+            if let Some(o) = prop.get_offset(netvar_name) {
+                return Some(o);
+            }
+        }
+        None
     }
 }
 
@@ -137,18 +160,21 @@ impl RecvProp {
             return None;
         }
 
-        debug!("Starting to parse RecvProp at 0x{:X}", base);
+        trace!("Starting to parse RecvProp at 0x{:X}", base);
         let (pname, ptable, offset) = RecvProp::parse(module.get_slice(base, 0x3C, false)?)
             .ok()?
             .1;
-        debug!(
+        trace!(
             "RecvProp at 0x{:X} => name 0x{:X}, table 0x{:X}, offset 0x{:X}",
-            base, pname, ptable, offset
+            base,
+            pname,
+            ptable,
+            offset
         );
         let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
             .ok()?
             .1;
-        debug!("RecvProp at 0x{:X} => {}", base, name);
+        trace!("RecvProp at 0x{:X} => {}", base, name);
 
         let table = RecvTable::new(ptable as usize, module);
 
@@ -158,9 +184,42 @@ impl RecvProp {
             offset: offset,
         })
     }
+
+    pub fn get_offset(&self, netvar_name: &str) -> Option<i32> {
+        if self.name == netvar_name {
+            return Some(self.offset);
+        }
+
+        match self.table {
+            Some(ref table) => match table.get_offset(netvar_name) {
+                Some(o) => Some(o + self.offset),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
 }
 
-pub fn test(first: usize, process: &Process) -> Option<Box<ClientClass>> {
-    let module = process.get_module("client.dll")?;
-    ClientClass::new(first + module.base, &module)
+impl NetvarManager {
+    pub fn new(first: usize, process: &Process) -> Option<Self> {
+        let module = process.get_module("client.dll")?;
+        debug!("First ClientClass at 0x{:X}", first);
+
+        let mut cc_opt = ClientClass::new(first + module.base, &module);
+        let mut tables = HashMap::new();
+
+        while let Some(cc) = cc_opt {
+            if let &Some(ref table) = &cc.table {
+                tables.insert(table.name.clone(), table.clone());
+            }
+            cc_opt = cc.next.clone();
+        }
+
+        debug!("NetvarManager adding {} tables!", tables.len());
+        Some(NetvarManager { tables })
+    }
+
+    pub fn get_offset(&self, table_name: &str, netvar_name: &str) -> Option<i32> {
+        self.tables.get(table_name)?.get_offset(netvar_name)
+    }
 }

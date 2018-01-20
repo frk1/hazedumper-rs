@@ -26,6 +26,8 @@ use config::Config;
 use simplelog::*;
 use structopt::StructOpt;
 
+type Map<T> = HashMap<String, T>;
+
 #[derive(StructOpt, Debug)]
 #[structopt(name = "hazedumper", about = "Signature scanning for every game!", version = "2.0.0",
             author = "frk <hazefrk+dev@gmail.com>")]
@@ -64,15 +66,17 @@ fn main() {
         .unwrap();
 
     let sigs = scan_signatures(&conf, &process);
-    if let Some(first) = sigs.get("dwGetAllClasses") {
-        games::csgo::test(first.clone(), &process);
-    }
+    let netvars = match conf.executable.as_ref() {
+        "csgo.exe" => scan_netvars(&sigs, &conf, &process),
+        _ => None,
+    };
 }
 
 fn setup_log(v: u64) -> () {
     let level = match v {
         0 => LogLevelFilter::Info,
-        _ => LogLevelFilter::Debug,
+        1 => LogLevelFilter::Debug,
+        _ => LogLevelFilter::Trace,
     };
 
     let logfile = OpenOptions::new()
@@ -87,7 +91,7 @@ fn setup_log(v: u64) -> () {
 }
 
 // Scan the signatures from the config and return a `HashMap`.
-fn scan_signatures(conf: &Config, process: &memlib::Process) -> HashMap<String, usize> {
+fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     info!(
         "Starting signature scanning: {} items",
         conf.signatures.len()
@@ -98,14 +102,42 @@ fn scan_signatures(conf: &Config, process: &memlib::Process) -> HashMap<String, 
         match sigscan::find_signature32(sig, &process) {
             Ok(r) => {
                 res.insert(sig.name.clone(), r);
+                info!("Found signature: {} => 0x{:X}", sig.name, r);
             }
             Err(err) => warn!("{} sigscan failed: {}", sig.name, err),
         };
     }
 
     info!(
-        "Finished signature scanning: {} items successful",
-        res.len()
+        "Finished signature scanning: {}/{} items successful",
+        res.len(),
+        conf.signatures.len()
     );
     res
+}
+
+// Scan the netvars from the config and return a `HashMap`.
+fn scan_netvars(sigs: &Map<usize>, conf: &Config, process: &memlib::Process) -> Option<Map<i32>> {
+    info!("Starting netvar scanning: {} items", conf.netvars.len());
+
+    let first = sigs.get("dwGetAllClasses")?;
+    let netvars = games::csgo::NetvarManager::new(first.clone(), process)?;
+
+    let mut res = HashMap::new();
+    for (_, netvar) in conf.netvars.iter().enumerate() {
+        match netvars.get_offset(&netvar.table, &netvar.prop) {
+            Some(o) => {
+                res.insert(netvar.name.clone(), o);
+                info!("Found netvar: {} => 0x{:X}", netvar.name, o);
+            }
+            None => warn!("{} netvar failed!", netvar.name),
+        };
+    }
+
+    info!(
+        "Finished netvar scanning: {}/{} items successful",
+        res.len(),
+        conf.netvars.len()
+    );
+    Some(res)
 }

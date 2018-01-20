@@ -68,6 +68,5 @@ pub fn find_signature32(sig: &Signature, process: &Process) -> Result<usize> {
         }
     }
 
-    info!("Found signature: {} => 0x{:X}", sig.name, addr);
     Ok(addr)
 }

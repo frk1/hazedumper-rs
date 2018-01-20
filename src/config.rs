@@ -36,6 +36,23 @@ pub struct Signature {
     pub relative: bool,
 }
 
+// This struct represents a netvar.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Netvar {
+    // Netvar name.
+    pub name: String,
+
+    // Table name.
+    pub table: String,
+
+    // Prop name.
+    pub prop: String,
+
+    // Offset to be added to the result.
+    #[serde(default)]
+    pub offset: isize,
+}
+
 impl Default for Signature {
     fn default() -> Self {
         Signature {
@@ -87,6 +104,10 @@ pub struct Config {
     // `Vec` containing the `Signature`s.
     #[serde(default)]
     pub signatures: Vec<Signature>,
+
+    // `Vec` containing the `Netvar`s.
+    #[serde(default)]
+    pub netvars: Vec<Netvar>,
 }
 
 impl Default for Config {
@@ -95,6 +116,7 @@ impl Default for Config {
             executable: "csgo.exe".to_string(),
             bitness: Bitness::X86,
             signatures: vec![],
+            netvars: vec![],
         }
     }
 }
