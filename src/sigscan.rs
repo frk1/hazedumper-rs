@@ -4,7 +4,7 @@ extern crate num;
 
 use self::num::NumCast;
 use config::Signature;
-use memlib::{Module, Process};
+use memlib::{Bitness, Module, Process};
 use std::mem;
 
 pub type Result<T> = ::std::result::Result<T, ScanError>;
@@ -16,11 +16,13 @@ pub enum ScanError {
     #[fail(display = "Pattern not found")] PatternNotFound,
 
     #[fail(display = "Offset out of module bounds")] OffsetOutOfBounds,
+
+    #[fail(display = "rip_relative failed")] RIPRelativeFailed,
 }
 
-pub fn find_signature32(sig: &Signature, process: &Process) -> Result<usize> {
+pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
     debug!("Begin scan: {}", sig.name);
-
+    debug!("Bitness: {:?}", process.bitness);
     debug!("Load module {}", sig.module);
     let module = process
         .get_module(&sig.module)
@@ -48,16 +50,33 @@ pub fn find_signature32(sig: &Signature, process: &Process) -> Result<usize> {
             ScanError::OffsetOutOfBounds
         })?;
 
-        let raw: u32 = unsafe { mem::transmute_copy(data) };
+        let tmp = match process.bitness {
+            Bitness::X86 => {
+                let raw: u32 = unsafe { mem::transmute_copy(data) };
+                raw as usize
+            }
+            Bitness::X64 => {
+                let raw: u64 = unsafe { mem::transmute_copy(data) };
+                raw as usize
+            }
+        };
 
-        debug!(
-            "Offset #{}: raw: 0x{:X} - base => 0x{:X}",
-            i,
-            raw,
-            (raw as usize - module.base)
-        );
+        addr = tmp - module.base;
+        debug!("Offset #{}: raw: 0x{:X} - base => 0x{:X}", i, tmp, addr);
+    }
 
-        addr = raw as usize - module.base;
+    if sig.rip_relative {
+        let addr_is_relative = match sig.offsets.len() {
+            0 => false,
+            _ => true,
+        };
+        debug!("rip_relative: addr_is_relative {}", addr_is_relative);
+        let rip: u32 = module
+            .get_raw(addr, addr_is_relative)
+            .ok_or(ScanError::RIPRelativeFailed)?;
+        debug!("rip_relative: addr 0x{:X} + rip 0x{:X} + 0x4", addr, rip);
+        addr += rip as usize + ::std::mem::size_of::<u32>();
+        debug!("rip_relative: addr => 0x{:X}", addr);
     }
 
     addr = (addr as isize + sig.extra) as usize;

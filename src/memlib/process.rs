@@ -27,10 +27,31 @@ impl Constructor for PROCESSENTRY32W {
     }
 }
 
+// This enum represents the bitness of the target process.
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub enum Bitness {
+    X86, // Pointersize 32-bit
+    X64, // Pointersize 64-bit
+}
+
+impl Default for Bitness {
+    fn default() -> Self {
+        Bitness::X86
+    }
+}
+
 #[derive(Debug)]
 pub struct Process {
+    // Process id.
     pub id: u32,
+
+    // Process bitness.
+    pub bitness: Bitness,
+
+    // Process `HANDLE`.
     handle: HANDLE,
+
+    // List of modules.
     modules: RefCell<HashMap<String, Rc<super::module::Module>>>,
 }
 
@@ -96,13 +117,14 @@ impl Drop for Process {
     }
 }
 
-pub fn from_pid(pid: u32) -> Option<Process> {
+pub fn from_pid(pid: u32, bitness: Bitness) -> Option<Process> {
     let handle = unsafe { OpenProcess(PROCESS_ALL_ACCESS, 0, pid) };
     if handle.is_null() {
         return None;
     }
     Some(Process {
         id: pid,
+        bitness: bitness,
         handle: handle,
         modules: RefCell::new(HashMap::new()),
     })
@@ -118,7 +140,7 @@ fn process32_next(h: &SnapshotHandle, pe: &mut PROCESSENTRY32W) -> bool {
     unsafe { Process32NextW(**h, pe) == TRUE }
 }
 
-pub fn from_name(name: &str) -> Option<Process> {
+pub fn from_name(name: &str, bitness: Bitness) -> Option<Process> {
     let snapshot = SnapshotHandle::new(0, TH32CS_SNAPPROCESS)?;
     let mut pe = PROCESSENTRY32W::new();
 
@@ -129,7 +151,7 @@ pub fn from_name(name: &str) -> Option<Process> {
     loop {
         let pname = String::from_utf16(&pe.szExeFile).unwrap_or_else(|_| String::new());
         if pname.contains(name) {
-            return from_pid(pe.th32ProcessID);
+            return from_pid(pe.th32ProcessID, bitness);
         }
         if !process32_next(&snapshot, &mut pe) {
             break;

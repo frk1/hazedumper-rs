@@ -3,6 +3,8 @@ extern crate serde_json;
 use std::fs::File;
 use std::str::FromStr;
 
+use memlib::Bitness;
+
 #[derive(Debug, Serialize, Deserialize, Fail)]
 pub enum ConfigError {
     #[fail(display = "Invalid Bitness, try 'X86' or 'X64'")] InvalidBitness,
@@ -34,6 +36,10 @@ pub struct Signature {
     // If true, subtract module base from result.
     #[serde(default)]
     pub relative: bool,
+
+    // If true, read a u32 at the position and add it to the result.
+    #[serde(default)]
+    pub rip_relative: bool,
 }
 
 // This struct represents a netvar.
@@ -62,20 +68,8 @@ impl Default for Signature {
             offsets: vec![],
             extra: 0,
             relative: false,
+            rip_relative: false,
         }
-    }
-}
-
-// This enum represents the bitness of the target process.
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum Bitness {
-    X86, // Pointersize 32-bit
-    X64, // Pointersize 64-bit
-}
-
-impl Default for Bitness {
-    fn default() -> Self {
-        Bitness::X86
     }
 }
 

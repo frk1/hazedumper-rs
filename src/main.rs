@@ -23,6 +23,7 @@ use std::fs::OpenOptions;
 use std::process::exit;
 
 use config::Config;
+use memlib::Bitness;
 use simplelog::*;
 use structopt::StructOpt;
 
@@ -55,7 +56,7 @@ struct Opt {
 
     /// Optional parameter, overrides the target bitness.
     #[structopt(short = "b", long = "bitness", help = "Target bitness (X86 or X64)")]
-    bitness: Option<config::Bitness>,
+    bitness: Option<Bitness>,
 }
 
 fn main() {
@@ -67,9 +68,10 @@ fn main() {
     let conf_path = opt.config.unwrap_or_else(|| "config.json".to_string());
     debug!("Loading config: {}", conf_path);
     let conf = Config::load(&conf_path).unwrap_or_default();
+    let bitness = opt.bitness.unwrap_or_else(|| conf.bitness);
 
     info!("Opening target process: {}", conf.executable);
-    let process = memlib::from_name(&conf.executable)
+    let process = memlib::from_name(&conf.executable, bitness)
         .ok_or_else(|| {
             error!("Could not open process {}!", conf.executable);
             exit(1);
@@ -119,7 +121,7 @@ fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     let mut res = BTreeMap::new();
 
     for sig in &conf.signatures {
-        match sigscan::find_signature32(sig, process) {
+        match sigscan::find_signature(sig, process) {
             Ok(r) => {
                 res.insert(sig.name.clone(), r);
                 info!("Found signature: {} => 0x{:X}", sig.name, r);
