@@ -42,19 +42,19 @@ impl Results {
     }
 
     pub fn dump(&self, filename: &str) -> ::std::io::Result<()> {
-        let mut out = File::create(format!("{}.json", filename))?;
-        serde_json::to_writer_pretty(&mut out, self).unwrap();
-        let mut out = File::create(format!("{}.min.json", filename))?;
-        serde_json::to_writer(&mut out, self).unwrap();
+        let mut out_json = File::create(format!("{}.json", filename))?;
+        let mut out_min_json = File::create(format!("{}.min.json", filename))?;
+        let mut out_yaml = File::create(format!("{}.yaml", filename))?;
+        let mut out_toml = File::create(format!("{}.toml", filename))?;
 
-        let mut out = File::create(format!("{}.yaml", filename))?;
-        serde_yaml::to_writer(&mut out, self).unwrap();
-
-        let mut out = File::create(format!("{}.toml", filename))?;
-        let ser = toml::ser::to_string_pretty(self).unwrap();
-        out.write_all(&ser.as_bytes()).unwrap();
-
+        serde_json::to_writer_pretty(&mut out_json, self).unwrap();
+        serde_json::to_writer(&mut out_min_json, self).unwrap();
+        serde_yaml::to_writer(&mut out_yaml, self).unwrap();
+        out_toml
+            .write_all(toml::ser::to_string_pretty(self).unwrap().as_bytes())
+            .unwrap();
         self.dump_hpp(filename)?;
+
         Ok(())
     }
 
