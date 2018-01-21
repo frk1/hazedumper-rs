@@ -88,7 +88,12 @@ fn main() {
 }
 
 fn setup_log(v: u64) -> () {
-    let level = match v {
+    let level_term = match v {
+        0 => LogLevelFilter::Info,
+        _ => LogLevelFilter::Debug,
+    };
+
+    let level_file = match v {
         0 => LogLevelFilter::Info,
         1 => LogLevelFilter::Debug,
         _ => LogLevelFilter::Trace,
@@ -100,8 +105,8 @@ fn setup_log(v: u64) -> () {
         .open("hazedumper.log");
 
     CombinedLogger::init(vec![
-        TermLogger::new(level, simplelog::Config::default()).unwrap(),
-        WriteLogger::new(level, simplelog::Config::default(), logfile.unwrap()),
+        TermLogger::new(level_term, simplelog::Config::default()).unwrap(),
+        WriteLogger::new(level_file, simplelog::Config::default(), logfile.unwrap()),
     ]).unwrap();
 }
 
