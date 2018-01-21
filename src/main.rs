@@ -37,12 +37,16 @@ struct Opt {
     #[structopt(short = "v", help = "Activate verbose mode")]
     verbose: u64,
 
+    /// A flag, true if used in the command line.
+    #[structopt(short = "s", long = "silent", help = "Silence output")]
+    silent: bool,
+
     /// Optional parameter, the config file.
-    #[structopt(help = "Path to the config file (default: config.json)")]
+    #[structopt(short = "c", long = "config", help = "Path to the config file (default: config.json)")]
     config: Option<String>,
 
     /// Optional parameter, the config file.
-    #[structopt(help = "Output filename")]
+    #[structopt(short = "o", long = "output", help = "Output filename")]
     filename: Option<String>,
 
     /// Optional parameter, overrides the target executable.
@@ -56,7 +60,9 @@ struct Opt {
 
 fn main() {
     let opt = Opt::from_args();
-    setup_log(opt.verbose);
+    if !opt.silent {
+        setup_log(opt.verbose);
+    }
 
     info!("Loading config");
     let conf = Config::load(&opt.config.unwrap_or_else(|| "config.json".to_string()))
