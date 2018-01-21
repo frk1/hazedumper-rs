@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
+
 use std::collections::BTreeMap;
 use std::str;
 
@@ -133,7 +135,7 @@ impl RecvTable {
     }
 
     pub fn get_offset(&self, netvar_name: &str) -> Option<i32> {
-        for prop in self.props.iter() {
+        for prop in &self.props {
             if let Some(o) = prop.get_offset(netvar_name) {
                 return Some(o);
             }
@@ -209,7 +211,7 @@ impl NetvarManager {
         let mut tables = BTreeMap::new();
 
         while let Some(cc) = cc_opt {
-            if let &Some(ref table) = &cc.table {
+            if let Some(ref table) = cc.table {
                 tables.insert(table.name.clone(), table.clone());
             }
             cc_opt = cc.next.clone();

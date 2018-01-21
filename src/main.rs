@@ -4,14 +4,13 @@ extern crate failure;
 extern crate log;
 #[macro_use]
 extern crate nom;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_json;
-extern crate simplelog;
-extern crate structopt;
 #[macro_use]
 extern crate structopt_derive;
+
+extern crate simplelog;
+extern crate structopt;
 
 mod config;
 mod games;
@@ -65,9 +64,9 @@ fn main() {
         setup_log(opt.verbose);
     }
 
-    info!("Loading config");
-    let conf = Config::load(&opt.config.unwrap_or_else(|| "config.json".to_string()))
-        .unwrap_or_else(|_| Config::default());
+    let conf_path = opt.config.unwrap_or_else(|| "config.json".to_string());
+    debug!("Loading config: {}", conf_path);
+    let conf = Config::load(&conf_path).unwrap_or_default();
 
     info!("Opening target process: {}", conf.executable);
     let process = memlib::from_name(&conf.executable)
@@ -84,7 +83,7 @@ fn main() {
     };
 
     let results = output::Results::new(sigs, netvars);
-    let filename = opt.filename.unwrap_or("csgo".to_string());
+    let filename = opt.filename.unwrap_or_else(|| "csgo".to_string());
     results.dump(&filename).expect("Dump results");
 }
 
@@ -114,8 +113,8 @@ fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     );
     let mut res = BTreeMap::new();
 
-    for (_, sig) in conf.signatures.iter().enumerate() {
-        match sigscan::find_signature32(sig, &process) {
+    for sig in &conf.signatures {
+        match sigscan::find_signature32(sig, process) {
             Ok(r) => {
                 res.insert(sig.name.clone(), r);
                 info!("Found signature: {} => 0x{:X}", sig.name, r);
@@ -137,10 +136,10 @@ fn scan_netvars(sigs: &Map<usize>, conf: &Config, process: &memlib::Process) -> 
     info!("Starting netvar scanning: {} items", conf.netvars.len());
 
     let first = sigs.get("dwGetAllClasses")?;
-    let netvars = games::csgo::NetvarManager::new(first.clone(), process)?;
+    let netvars = games::csgo::NetvarManager::new(*first, process)?;
 
     let mut res = BTreeMap::new();
-    for (_, netvar) in conf.netvars.iter().enumerate() {
+    for netvar in &conf.netvars {
         match netvars.get_offset(&netvar.table, &netvar.prop) {
             Some(o) => {
                 res.insert(netvar.name.clone(), o as isize + netvar.offset);
