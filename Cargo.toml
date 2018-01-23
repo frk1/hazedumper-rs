@@ -7,7 +7,6 @@ build = "build.rs"
 [package.metadata.winres]
 ProductName = "HazeDumper"
 CompanyName = "Haze-Productions"
-FileDescription = "HazeDumper"
 OriginalFilename = "hazedumper.exe"
 LegalCopyright = "MIT-License"
 
