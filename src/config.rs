@@ -40,6 +40,10 @@ pub struct Signature {
     // If true, read a u32 at the position and add it to the result.
     #[serde(default)]
     pub rip_relative: bool,
+
+    // Offset to the rip relative.
+    #[serde(default)]
+    pub rip_offset: isize,
 }
 
 // This struct represents a netvar.
@@ -69,6 +73,7 @@ impl Default for Signature {
             extra: 0,
             relative: false,
             rip_relative: false,
+            rip_offset: 0,
         }
     }
 }
