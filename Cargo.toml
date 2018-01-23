@@ -1,5 +1,5 @@
 [package]
-name = "hazedumper-rs-new"
+name = "hazedumper"
 version = "2.0.0"
 authors = ["frk <hazefrk+dev@gmail.com>"]
 build = "build.rs"
