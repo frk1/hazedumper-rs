@@ -2,6 +2,14 @@
 name = "hazedumper-rs-new"
 version = "2.0.0"
 authors = ["frk <hazefrk+dev@gmail.com>"]
+build = "build.rs"
+
+[package.metadata.winres]
+ProductName = "HazeDumper"
+CompanyName = "Haze-Productions"
+FileDescription = "HazeDumper"
+OriginalFilename = "hazedumper.exe"
+LegalCopyright = "MIT-License"
 
 [dependencies]
 serde = "1.0.27"
@@ -22,3 +30,6 @@ toml = "0.4.5"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt"] }
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
