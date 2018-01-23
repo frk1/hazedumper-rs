@@ -16,18 +16,19 @@ pub enum ConfigError {
     #[fail(display = "Could not load config from file")] LoadingFromFile,
 }
 
-// This struct represents a signature.
+// This struct represents the dumper results.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Results {
     // Timestamp.
     #[serde(default = "Local::now")]
     pub timestamp: DateTime<Local>,
 
-    // Signature offsets for dereferencing.
+    // Results of the signature scanning.
     #[serde(default)]
     pub signatures: Map<usize>,
 
-    // Extra to be added to the result.
+    // Optional results for the netvar scanning.
+    // Will not be serialized if `None`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub netvars: Option<Map<isize>>,
 }
