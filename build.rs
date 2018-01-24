@@ -20,7 +20,7 @@ fn git_semver() -> String {
         .args(&["describe", "HEAD"])
         .output()
         .unwrap();
-    String::from_utf8(output.stdout).unwrap()
+    String::from_utf8(output.stdout).unwrap().trim().to_string()
 }
 
 #[cfg(unix)]
