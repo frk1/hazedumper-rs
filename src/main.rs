@@ -30,7 +30,7 @@ use structopt::StructOpt;
 type Map<T> = BTreeMap<String, T>;
 
 #[derive(StructOpt, Debug)]
-#[structopt(name = "hazedumper", about = "Signature scanning for every game!", version = "2.0.0",
+#[structopt(name = "hazedumper", about = "Signature scanning for every game!",
             author = "frk <hazefrk+dev@gmail.com>")]
 struct Opt {
     /// A flag, true if used in the command line.
@@ -60,7 +60,8 @@ struct Opt {
 }
 
 fn main() {
-    let opt = Opt::from_args();
+    let app = Opt::clap().version(env!("GIT_PKG_VERSION_SEMVER"));
+    let opt = Opt::from_clap(app.get_matches());
     if !opt.silent {
         setup_log(opt.verbose);
     }
