@@ -84,16 +84,13 @@ fn main() {
     results.dump(&filename).expect("Dump results");
 }
 
+/// Setup log levels for terminal and file.
 fn setup_log(v: u64) -> () {
-    let level_term = match v {
-        0 => LogLevelFilter::Info,
-        _ => LogLevelFilter::Debug,
-    };
-
-    let level_file = match v {
-        0 => LogLevelFilter::Info,
-        1 => LogLevelFilter::Debug,
-        _ => LogLevelFilter::Trace,
+    use LogLevelFilter::{Debug, Info, Trace};
+    let (level_term, level_file) = match v {
+        0 => (Info, Info),
+        1 => (Debug, Debug),
+        _ => (Debug, Trace),
     };
 
     let logfile = OpenOptions::new()
@@ -107,7 +104,7 @@ fn setup_log(v: u64) -> () {
     ]).unwrap();
 }
 
-// Scan the signatures from the config and return a `Map<usize>`.
+/// Scan the signatures from the config and return a `Map<usize>`.
 fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     info!(
         "Starting signature scanning: {} items",
@@ -133,7 +130,7 @@ fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
     res
 }
 
-// Scan the netvars from the config and return a `Option<Map<i32>>`.
+/// Scan the netvars from the config and return a `Option<Map<i32>>`.
 fn scan_netvars(sigs: &Map<usize>, conf: &Config, process: &memlib::Process) -> Option<Map<isize>> {
     info!("Starting netvar scanning: {} items", conf.netvars.len());
 
