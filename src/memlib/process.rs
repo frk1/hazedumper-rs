@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use self::winapi::shared::basetsd::SIZE_T;
-use self::winapi::shared::minwindef::{LPCVOID, LPVOID, TRUE};
+use self::winapi::shared::minwindef::{BOOL, FALSE, LPCVOID, LPVOID, PBOOL, TRUE};
 use self::winapi::shared::ntdef::HANDLE;
 use self::winapi::um::handleapi::CloseHandle;
 use self::winapi::um::memoryapi::{ReadProcessMemory, WriteProcessMemory};
@@ -16,6 +16,7 @@ use self::winapi::um::tlhelp32::{PROCESSENTRY32W,
                                  Process32NextW,
                                  TH32CS_SNAPPROCESS};
 use self::winapi::um::winnt::PROCESS_ALL_ACCESS;
+use self::winapi::um::wow64apiset::IsWow64Process;
 use memlib::*;
 
 impl Constructor for PROCESSENTRY32W {
@@ -27,26 +28,13 @@ impl Constructor for PROCESSENTRY32W {
     }
 }
 
-// This enum represents the bitness of the target process.
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum Bitness {
-    X86, // Pointersize 32-bit
-    X64, // Pointersize 64-bit
-}
-
-impl Default for Bitness {
-    fn default() -> Self {
-        Bitness::X86
-    }
-}
-
 #[derive(Debug)]
 pub struct Process {
     // Process id.
     pub id: u32,
 
     // Process bitness.
-    pub bitness: Bitness,
+    pub is_wow64: bool,
 
     // Process `HANDLE`.
     handle: HANDLE,
@@ -117,14 +105,28 @@ impl Drop for Process {
     }
 }
 
-pub fn from_pid(pid: u32, bitness: Bitness) -> Option<Process> {
+pub fn from_pid(pid: u32) -> Option<Process> {
     let handle = unsafe { OpenProcess(PROCESS_ALL_ACCESS, 0, pid) };
     if handle.is_null() {
         return None;
     }
+
+    let mut tmp: BOOL = 0;
+
+    if unsafe { IsWow64Process(handle, &mut tmp as PBOOL) } == FALSE {
+        warn!("Could not determine process bitness: IsWow64Process returned an error!");
+        return None;
+    }
+
+    let is_wow64 = match tmp {
+        FALSE => false,
+        _ => true,
+    };
+    debug!("PID {} IsWow64: {}", pid, is_wow64);
+
     Some(Process {
         id: pid,
-        bitness: bitness,
+        is_wow64: is_wow64,
         handle: handle,
         modules: RefCell::new(HashMap::new()),
     })
@@ -140,7 +142,7 @@ fn process32_next(h: &SnapshotHandle, pe: &mut PROCESSENTRY32W) -> bool {
     unsafe { Process32NextW(**h, pe) == TRUE }
 }
 
-pub fn from_name(name: &str, bitness: Bitness) -> Option<Process> {
+pub fn from_name(name: &str) -> Option<Process> {
     let snapshot = SnapshotHandle::new(0, TH32CS_SNAPPROCESS)?;
     let mut pe = PROCESSENTRY32W::new();
 
@@ -151,7 +153,7 @@ pub fn from_name(name: &str, bitness: Bitness) -> Option<Process> {
     loop {
         let pname = String::from_utf16(&pe.szExeFile).unwrap_or_else(|_| String::new());
         if pname.contains(name) {
-            return from_pid(pe.th32ProcessID, bitness);
+            return from_pid(pe.th32ProcessID);
         }
         if !process32_next(&snapshot, &mut pe) {
             break;

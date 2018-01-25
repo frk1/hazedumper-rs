@@ -1,13 +1,9 @@
 extern crate serde_json;
 
 use std::fs::File;
-use std::str::FromStr;
-
-use memlib::Bitness;
 
 #[derive(Debug, Serialize, Deserialize, Fail)]
 pub enum ConfigError {
-    #[fail(display = "Invalid Bitness, try 'X86' or 'X64'")] InvalidBitness,
     #[fail(display = "Could not load config from file")] LoadingFromFile,
 }
 
@@ -78,27 +74,11 @@ impl Default for Signature {
     }
 }
 
-impl FromStr for Bitness {
-    type Err = ConfigError;
-
-    fn from_str(s: &str) -> Result<Self> {
-        match s {
-            "x86" | "X86" => Ok(Bitness::X86),
-            "x64" | "X64" => Ok(Bitness::X64),
-            _ => Err(ConfigError::InvalidBitness),
-        }
-    }
-}
-
 // This struct represents the config.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
     // Executable target name.
     pub executable: String,
-
-    // `Bitness` of the target process. Defaults to X86.
-    #[serde(default)]
-    pub bitness: Bitness,
 
     // Output file names
     #[serde(default)]
@@ -117,7 +97,6 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             executable: "csgo.exe".to_string(),
-            bitness: Bitness::X86,
             filename: "csgo".to_string(),
             signatures: vec![],
             netvars: vec![],

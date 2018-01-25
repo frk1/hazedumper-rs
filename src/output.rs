@@ -10,12 +10,6 @@ use std::io::prelude::*;
 
 type Map<T> = BTreeMap<String, T>;
 
-#[derive(Debug, Serialize, Deserialize, Fail)]
-pub enum ConfigError {
-    #[fail(display = "Invalid Bitness, try 'X86' or 'X64'")] InvalidBitness,
-    #[fail(display = "Could not load config from file")] LoadingFromFile,
-}
-
 // This struct represents the dumper results.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Results {

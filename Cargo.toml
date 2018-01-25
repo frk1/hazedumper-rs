@@ -28,7 +28,7 @@ serde_yaml = "0.7.3"
 toml = "0.4.5"
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt"] }
+winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt", "wow64apiset"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"

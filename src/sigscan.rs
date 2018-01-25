@@ -4,7 +4,7 @@ extern crate num;
 
 use self::num::NumCast;
 use config::Signature;
-use memlib::{Bitness, Module, Process};
+use memlib::{Module, Process};
 use std::mem;
 
 pub type Result<T> = ::std::result::Result<T, ScanError>;
@@ -22,7 +22,7 @@ pub enum ScanError {
 
 pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
     debug!("Begin scan: {}", sig.name);
-    debug!("Bitness: {:?}", process.bitness);
+    debug!("IsWow64: {:?}", process.is_wow64);
     debug!("Load module {}", sig.module);
     let module = process
         .get_module(&sig.module)
@@ -54,12 +54,12 @@ pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
             ScanError::OffsetOutOfBounds
         })?;
 
-        let tmp = match process.bitness {
-            Bitness::X86 => {
+        let tmp = match process.is_wow64 {
+            true => {
                 let raw: u32 = unsafe { mem::transmute_copy(data) };
                 raw as usize
             }
-            Bitness::X64 => {
+            false => {
                 let raw: u64 = unsafe { mem::transmute_copy(data) };
                 raw as usize
             }
