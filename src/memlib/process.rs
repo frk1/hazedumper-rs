@@ -122,7 +122,7 @@ pub fn from_pid(pid: u32) -> Option<Process> {
         FALSE => false,
         _ => true,
     };
-    debug!("PID {} IsWow64: {}", pid, is_wow64);
+    debug!("PID {} is_wow64: {}", pid, is_wow64);
 
     Some(Process {
         id: pid,

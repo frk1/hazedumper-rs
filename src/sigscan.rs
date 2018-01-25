@@ -45,7 +45,7 @@ pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
     for (i, o) in sig.offsets.iter().enumerate() {
         debug!("Offset #{}: ptr: 0x{:X} offset: 0x{:X}", i, addr, o);
 
-        let pos = (addr as isize + o) as usize;
+        let pos = (addr as isize).wrapping_add(*o) as usize;
         let data = module.data.get(pos).ok_or_else(|| {
             debug!(
                 "WARN OOB - ptr: 0x{:X} module size: 0x{:X}",
@@ -65,7 +65,7 @@ pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
             }
         };
 
-        addr = tmp - module.base;
+        addr = tmp.wrapping_sub(module.base);
         debug!("Offset #{}: raw: 0x{:X} - base => 0x{:X}", i, tmp, addr);
     }
 
@@ -74,7 +74,7 @@ pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
             "rip_relative: addr 0x{:X} + rip_offset 0x{:X}",
             addr, sig.rip_offset
         );
-        addr = (addr as isize + sig.rip_offset) as usize;
+        addr = (addr as isize).wrapping_add(sig.rip_offset) as usize;
         debug!("rip_relative: addr = 0x{:X}", addr);
 
         let rip: u32 = module
@@ -87,20 +87,20 @@ pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
             rip,
             ::std::mem::size_of::<u32>()
         );
-        addr += rip as usize + ::std::mem::size_of::<u32>();
+        addr = addr.wrapping_add(rip as usize + ::std::mem::size_of::<u32>());
         debug!("rip_relative: addr => 0x{:X}", addr);
     }
 
     debug!("Adding extra 0x{:X}", sig.extra);
-    addr = (addr as isize + sig.extra) as usize;
+    addr = (addr as isize).wrapping_add(sig.extra) as usize;
     if !sig.relative {
         debug!(
             "Not relative, addr 0x{:X} + base 0x{:X} => 0x{:X}",
             addr,
             module.base,
-            addr + module.base
+            addr.wrapping_add(module.base)
         );
-        addr += module.base;
+        addr = addr.wrapping_add(module.base);
     }
 
     Ok(addr)
