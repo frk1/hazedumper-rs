@@ -1,10 +1,5 @@
-#![allow(unused)]
-
-extern crate num;
-
-use self::num::NumCast;
 use config::Signature;
-use memlib::{Module, Process};
+use memlib::Process;
 use std::mem;
 
 pub type Result<T> = ::std::result::Result<T, ScanError>;
@@ -54,15 +49,12 @@ pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {
             ScanError::OffsetOutOfBounds
         })?;
 
-        let tmp = match process.is_wow64 {
-            true => {
-                let raw: u32 = unsafe { mem::transmute_copy(data) };
-                raw as usize
-            }
-            false => {
-                let raw: u64 = unsafe { mem::transmute_copy(data) };
-                raw as usize
-            }
+        let tmp = if process.is_wow64 {
+            let raw: u32 = unsafe { mem::transmute_copy(data) };
+            raw as usize
+        } else {
+            let raw: u64 = unsafe { mem::transmute_copy(data) };
+            raw as usize
         };
 
         addr = tmp.wrapping_sub(module.base);

@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 mod findpattern;
 mod module;
 mod process;

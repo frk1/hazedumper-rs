@@ -21,7 +21,6 @@ log = "0.4.1"
 simplelog = "0.4.4"
 failure = "0.1.1"
 regex = "0.2.5"
-num = "0.1.41"
 nom = "4.0.0-alpha2"
 chrono = { version = "0.4", features = ["serde"] }
 serde_yaml = "0.7.3"

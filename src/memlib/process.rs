@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use self::winapi::shared::basetsd::SIZE_T;
-use self::winapi::shared::minwindef::{BOOL, FALSE, LPCVOID, LPVOID, PBOOL, TRUE};
+use self::winapi::shared::minwindef::{BOOL, FALSE, LPCVOID, LPVOID, PBOOL};
 use self::winapi::shared::ntdef::HANDLE;
 use self::winapi::um::handleapi::CloseHandle;
 use self::winapi::um::memoryapi::{ReadProcessMemory, WriteProcessMemory};
@@ -44,6 +44,7 @@ pub struct Process {
 }
 
 impl Process {
+    #[allow(dead_code)]
     pub fn read<T: Copy>(&self, address: usize) -> Option<T> {
         let mut buffer = unsafe { mem::zeroed::<T>() };
         match unsafe {
@@ -55,8 +56,8 @@ impl Process {
                 ptr::null_mut::<SIZE_T>(),
             )
         } {
-            TRUE => Some(buffer),
-            _ => None,
+            FALSE => None,
+            _ => Some(buffer),
         }
     }
 
@@ -68,10 +69,11 @@ impl Process {
                 buf as *mut T as LPVOID,
                 mem::size_of::<T>() as SIZE_T * count,
                 ptr::null_mut::<SIZE_T>(),
-            ) == TRUE
+            ) != FALSE
         }
     }
 
+    #[allow(dead_code)]
     pub fn write<T: Copy>(&self, address: u32, buf: &T) -> bool {
         unsafe {
             WriteProcessMemory(
@@ -80,7 +82,7 @@ impl Process {
                 buf as *const T as LPCVOID,
                 mem::size_of::<T>() as SIZE_T,
                 ptr::null_mut::<SIZE_T>(),
-            ) == TRUE
+            ) != FALSE
         }
     }
 }
@@ -134,12 +136,12 @@ pub fn from_pid(pid: u32) -> Option<Process> {
 
 /// Wrapper around the `Process32FirstW` windows api
 fn process32_first(h: &SnapshotHandle, pe: &mut PROCESSENTRY32W) -> bool {
-    unsafe { Process32FirstW(**h, pe) == TRUE }
+    unsafe { Process32FirstW(**h, pe) != FALSE }
 }
 
 /// Wrapper around the `Process32NextW` windows api
 fn process32_next(h: &SnapshotHandle, pe: &mut PROCESSENTRY32W) -> bool {
-    unsafe { Process32NextW(**h, pe) == TRUE }
+    unsafe { Process32NextW(**h, pe) != FALSE }
 }
 
 pub fn from_name(name: &str) -> Option<Process> {

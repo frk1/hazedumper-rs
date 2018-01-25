@@ -1,7 +1,6 @@
-extern crate num;
 extern crate winapi;
 
-use self::winapi::shared::minwindef::TRUE;
+use self::winapi::shared::minwindef::FALSE;
 use self::winapi::um::tlhelp32::{MODULEENTRY32W,
                                  Module32FirstW,
                                  Module32NextW,
@@ -16,20 +15,6 @@ pub struct Module {
     pub base: usize,
     pub size: usize,
     pub data: Vec<u8>,
-}
-
-/// Enum for the different signature modes:
-///
-/// - `Nop`: No operation
-/// - `Read`: Read address
-/// - `Substract`: Subtract base address
-/// - `ReadSubtract`: Read and subtract base address
-#[derive(Debug, Clone, PartialEq)]
-pub enum Mode {
-    Nop,
-    Read,
-    Subtract,
-    ReadSubtract,
 }
 
 impl Constructor for MODULEENTRY32W {
@@ -86,12 +71,12 @@ impl Module {
 
 /// Wrapper around the `Module32FirstW` windows api
 fn module32_first(h: &SnapshotHandle, me: &mut MODULEENTRY32W) -> bool {
-    unsafe { Module32FirstW(**h, me) == TRUE }
+    unsafe { Module32FirstW(**h, me) != FALSE }
 }
 
 /// Wrapper around the `Module32NextW` windows api
 fn module32_next(h: &SnapshotHandle, me: &mut MODULEENTRY32W) -> bool {
-    unsafe { Module32NextW(**h, me) == TRUE }
+    unsafe { Module32NextW(**h, me) != FALSE }
 }
 
 pub fn get(name: &str, process: &Process) -> Option<Module> {
