@@ -3,12 +3,17 @@ extern crate serde_json;
 extern crate serde_yaml;
 extern crate toml;
 
+mod csharp;
+mod hpp;
+mod vbnet;
+
 use self::chrono::prelude::*;
 use std::collections::BTreeMap;
 use std::fs::File;
+use std::io;
 use std::io::prelude::*;
 
-type Map<T> = BTreeMap<String, T>;
+pub type Map<T> = BTreeMap<String, T>;
 
 // This struct represents the dumper results.
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -27,6 +32,21 @@ pub struct Results {
     pub netvars: Option<Map<isize>>,
 }
 
+/// Trait to be implemented to be dumpable.
+trait Dumpable {
+    /// Dump the results.
+    fn dump(&mut self) -> io::Result<()>;
+
+    /// Write the header.
+    fn header(&mut self) -> io::Result<()>;
+
+    /// Write the netvars.
+    fn netvars(&mut self) -> io::Result<()>;
+
+    /// Write the signatures.
+    fn signatures(&mut self) -> io::Result<()>;
+}
+
 impl Results {
     pub fn new(signatures: Map<usize>, netvars: Option<Map<isize>>) -> Self {
         Results {
@@ -36,7 +56,7 @@ impl Results {
         }
     }
 
-    pub fn dump(&self, filename: &str) -> ::std::io::Result<()> {
+    pub fn dump_all(&self, filename: &str) -> ::std::io::Result<()> {
         let mut out_json = File::create(format!("{}.json", filename))?;
         let mut out_min_json = File::create(format!("{}.min.json", filename))?;
         let mut out_yaml = File::create(format!("{}.yaml", filename))?;
@@ -48,32 +68,14 @@ impl Results {
         out_toml
             .write_all(toml::ser::to_string_pretty(self).unwrap().as_bytes())
             .unwrap();
-        self.dump_hpp(filename)?;
 
-        Ok(())
-    }
+        let mut out_hpp = hpp::Dumper::new(self, filename)?;
+        let mut out_csharp = csharp::Dumper::new(self, filename)?;
+        let mut out_vbnet = vbnet::Dumper::new(self, filename)?;
+        out_hpp.dump()?;
+        out_csharp.dump()?;
+        out_vbnet.dump()?;
 
-    fn dump_hpp(&self, filename: &str) -> ::std::io::Result<()> {
-        let mut f = File::create(format!("{}.hpp", filename))?;
-        writeln!(&mut f, "#pragma once")?;
-        writeln!(&mut f, "#include <cstddef>\n")?;
-        writeln!(&mut f, "// {}\n", self.timestamp)?;
-
-        writeln!(&mut f, "namespace hazedumper {{")?;
-        if let Some(ref netvars) = self.netvars {
-            writeln!(&mut f, "namespace netvars {{")?;
-            for (k, v) in netvars {
-                writeln!(&mut f, "constexpr ::std::ptrdiff_t {} = {:#X};", k, v)?;
-            }
-            writeln!(&mut f, "}} // namespace netvars")?;
-        }
-
-        writeln!(&mut f, "namespace signatures {{")?;
-        for (k, v) in &self.signatures {
-            writeln!(&mut f, "constexpr ::std::ptrdiff_t {} = {:#X};", k, v)?;
-        }
-        writeln!(&mut f, "}} // namespace signatures")?;
-        writeln!(&mut f, "}} // namespace hazedumper")?;
         Ok(())
     }
 }

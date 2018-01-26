@@ -81,7 +81,7 @@ fn main() {
 
     let results = output::Results::new(sigs, netvars);
     let filename = opt.filename.unwrap_or_else(|| "csgo".to_string());
-    results.dump(&filename).expect("Dump results");
+    results.dump_all(&filename).expect("Dump results");
 }
 
 /// Setup log levels for terminal and file.
