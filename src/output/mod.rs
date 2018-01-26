@@ -8,6 +8,7 @@ mod hpp;
 mod vbnet;
 
 use self::chrono::prelude::*;
+use self::chrono::serde::ts_seconds;
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io;
@@ -19,8 +20,8 @@ pub type Map<T> = BTreeMap<String, T>;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Results {
     // Timestamp.
-    #[serde(default = "Local::now")]
-    pub timestamp: DateTime<Local>,
+    #[serde(with = "ts_seconds")]
+    pub timestamp: DateTime<Utc>,
 
     // Results of the signature scanning.
     #[serde(default)]
@@ -50,7 +51,7 @@ trait Dumpable {
 impl Results {
     pub fn new(signatures: Map<usize>, netvars: Option<Map<isize>>) -> Self {
         Results {
-            timestamp: Local::now(),
+            timestamp: Utc::now(),
             signatures,
             netvars,
         }
