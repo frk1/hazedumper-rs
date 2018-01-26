@@ -55,12 +55,12 @@ impl ClientClass {
             return None;
         }
 
-        trace!("Starting to parse ClientClass at 0x{:X}", base);
+        trace!("Starting to parse ClientClass at {:#X}", base);
         let (pname, ptable, pnext, id) = ClientClass::parse(module.get_slice(base, 0x18, false)?)
             .ok()?
             .1;
         trace!(
-            "ClientClass at 0x{:X} => name 0x{:X}, table 0x{:X}, next 0x{:X}, id 0x{:X}",
+            "ClientClass at {:#X} => name {:#X}, table {:#X}, next {:#X}, id {:#X}",
             base,
             pname,
             ptable,
@@ -70,7 +70,7 @@ impl ClientClass {
         let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
             .ok()?
             .1;
-        trace!("ClientClass at 0x{:X} => {}", base, name);
+        trace!("ClientClass at {:#X} => {}", base, name);
 
         let table = RecvTable::new(ptable as usize, module);
         let next = match pnext {
@@ -104,12 +104,12 @@ impl RecvTable {
             return None;
         }
 
-        trace!("Starting to parse RecvTable at 0x{:X}", base);
+        trace!("Starting to parse RecvTable at {:#X}", base);
         let (props, numprops, pname) = RecvTable::parse(module.get_slice(base, 0x10, false)?)
             .ok()?
             .1;
         trace!(
-            "RecvTable at 0x{:X} => name 0x{:X}, props 0x{:X}, numprops 0x{:X}",
+            "RecvTable at {:#X} => name {:#X}, props {:#X}, numprops {:#X}",
             base,
             pname,
             props,
@@ -118,7 +118,7 @@ impl RecvTable {
         let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
             .ok()?
             .1;
-        trace!("RecvTable at 0x{:X} => {}", base, name);
+        trace!("RecvTable at {:#X} => {}", base, name);
 
         let mut vec_props = vec![];
         for i in 0..numprops {
@@ -162,12 +162,12 @@ impl RecvProp {
             return None;
         }
 
-        trace!("Starting to parse RecvProp at 0x{:X}", base);
+        trace!("Starting to parse RecvProp at {:#X}", base);
         let (pname, ptable, offset) = RecvProp::parse(module.get_slice(base, 0x3C, false)?)
             .ok()?
             .1;
         trace!(
-            "RecvProp at 0x{:X} => name 0x{:X}, table 0x{:X}, offset 0x{:X}",
+            "RecvProp at {:#X} => name {:#X}, table {:#X}, offset {:#X}",
             base,
             pname,
             ptable,
@@ -176,7 +176,7 @@ impl RecvProp {
         let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
             .ok()?
             .1;
-        trace!("RecvProp at 0x{:X} => {}", base, name);
+        trace!("RecvProp at {:#X} => {}", base, name);
 
         let table = RecvTable::new(ptable as usize, module);
 
@@ -205,7 +205,7 @@ impl RecvProp {
 impl NetvarManager {
     pub fn new(first: usize, process: &Process) -> Option<Self> {
         let module = process.get_module("client.dll")?;
-        debug!("First ClientClass at 0x{:X}", first);
+        debug!("First ClientClass at {:#X}", first);
 
         let mut cc_opt = ClientClass::new(first + module.base, &module);
         let mut tables = BTreeMap::new();

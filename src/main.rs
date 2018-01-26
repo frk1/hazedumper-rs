@@ -116,7 +116,7 @@ fn scan_signatures(conf: &Config, process: &memlib::Process) -> Map<usize> {
         match sigscan::find_signature(sig, process) {
             Ok(r) => {
                 res.insert(sig.name.clone(), r);
-                info!("Found signature: {} => 0x{:X}", sig.name, r);
+                info!("Found signature: {} => {:#X}", sig.name, r);
             }
             Err(err) => warn!("{} sigscan failed: {}", sig.name, err),
         };
@@ -142,7 +142,7 @@ fn scan_netvars(sigs: &Map<usize>, conf: &Config, process: &memlib::Process) -> 
         match netvars.get_offset(&netvar.table, &netvar.prop) {
             Some(o) => {
                 res.insert(netvar.name.clone(), o as isize + netvar.offset);
-                info!("Found netvar: {} => 0x{:X}", netvar.name, o);
+                info!("Found netvar: {} => {:#X}", netvar.name, o);
             }
             None => warn!("{} netvar failed!", netvar.name),
         };

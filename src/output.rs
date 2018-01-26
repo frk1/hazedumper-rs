@@ -57,20 +57,20 @@ impl Results {
         let mut f = File::create(format!("{}.hpp", filename))?;
         writeln!(&mut f, "#pragma once")?;
         writeln!(&mut f, "#include <cstddef>\n")?;
-        writeln!(&mut f, "// {}\n", Local::now().to_string())?;
+        writeln!(&mut f, "// {}\n", self.timestamp)?;
 
         writeln!(&mut f, "namespace hazedumper {{")?;
         if let Some(ref netvars) = self.netvars {
             writeln!(&mut f, "namespace netvars {{")?;
             for (k, v) in netvars {
-                writeln!(&mut f, "constexpr ::std::ptrdiff_t {} = 0x{:X};", k, v)?;
+                writeln!(&mut f, "constexpr ::std::ptrdiff_t {} = {:#X};", k, v)?;
             }
             writeln!(&mut f, "}} // namespace netvars")?;
         }
 
         writeln!(&mut f, "namespace signatures {{")?;
         for (k, v) in &self.signatures {
-            writeln!(&mut f, "constexpr ::std::ptrdiff_t {} = 0x{:X};", k, v)?;
+            writeln!(&mut f, "constexpr ::std::ptrdiff_t {} = {:#X};", k, v)?;
         }
         writeln!(&mut f, "}} // namespace signatures")?;
         writeln!(&mut f, "}} // namespace hazedumper")?;
