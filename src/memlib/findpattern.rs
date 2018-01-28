@@ -1,7 +1,8 @@
 extern crate regex;
 use self::regex::bytes::Regex;
 
-/// Enables the user to generate a byte regex out of the normal signature format.
+/// Enables the user to generate a byte regex out of the normal signature
+/// format.
 pub fn generate_regex(raw: &str) -> Option<Regex> {
     let mut res = raw.to_string()
         .split_whitespace()

@@ -1,10 +1,74 @@
 #![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
 
+extern crate zero;
+
 use std::collections::BTreeMap;
+use std::fmt;
 use std::str;
 
 use memlib::{Module, Process};
-use nom::*;
+
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct _ClientClass {
+    pad1: [u8; 8],
+    pub name: u32,  // 0x08
+    pub table: u32, // 0x0C
+    pub next: u32,  // 0x10
+    pub id: i32,    // 0x14
+} // Size 0x18
+
+#[derive(Copy, Clone, Debug)]
+#[repr(C)]
+pub struct _RecvTable {
+    pub props: u32,    // 0x00
+    pub numprops: u32, // 0x04
+    pad1: [u8; 4],     // 0x08
+    pub name: u32,     // 0x0C
+} // Size 0x10
+
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct _RecvProp {
+    pub name: u32,    // 0x00
+    pad1: [u8; 0x24], // 0x04
+    pub table: u32,   // 0x28
+    pub offset: i32,  // 0x2C
+} // Size 0x30
+
+unsafe impl zero::Pod for _ClientClass {}
+unsafe impl zero::Pod for _RecvTable {}
+unsafe impl zero::Pod for _RecvProp {}
+
+impl fmt::Display for _ClientClass {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "ClientClass => name {:#X}, table {:#X}, next {:#X}, id {:#X}",
+            self.name, self.table, self.next, self.id
+        )
+    }
+}
+
+impl fmt::Display for _RecvTable {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "RecvTable => props {:#X}, numprops {:#X}, name {:#X}",
+            self.props, self.numprops, self.name
+        )
+    }
+}
+
+impl fmt::Display for _RecvProp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "RecvProp => name {:#X}, table {:#X}, offset {:#X}",
+            self.name, self.table, self.offset
+        )
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClientClass {
@@ -32,97 +96,48 @@ pub struct NetvarManager {
     tables: BTreeMap<String, RecvTable>,
 }
 
-named!(
-    parse_cstring<&str>,
-    map_res!(take_until!("\0"), str::from_utf8)
-);
-
 impl ClientClass {
-    // name-ptr, table-ptr, next-ptr, id
-    named!(pub parse <(u32, u32, u32, i32)>,
-        do_parse!(
-            take!(0x08)    >>
-            name  : le_u32 >>
-            table : le_u32 >>
-            next  : le_u32 >>
-            id    : le_i32 >>
-            ( (name, table, next, id) )
-        )
-    );
-
     pub fn new(base: usize, module: &Module) -> Option<Box<ClientClass>> {
         if base == 0 {
             return None;
         }
 
         trace!("Starting to parse ClientClass at {:#X}", base);
-        let (pname, ptable, pnext, id) = ClientClass::parse(module.get_slice(base, 0x18, false)?)
-            .ok()?
-            .1;
-        trace!(
-            "ClientClass at {:#X} => name {:#X}, table {:#X}, next {:#X}, id {:#X}",
-            base,
-            pname,
-            ptable,
-            pnext,
-            id
-        );
-        let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
-            .ok()?
-            .1;
+        let cc = zero::read::<_ClientClass>(module.get_slice(base, 0x18, false)?);
+        trace!("{}", cc);
+        let name = zero::read_str(module.get(cc.name as usize, false)?);
         trace!("ClientClass at {:#X} => {}", base, name);
 
-        let table = RecvTable::new(ptable as usize, module);
-        let next = match pnext {
+        let table = RecvTable::new(cc.table as usize, module);
+        let next = match cc.next {
             0 => None,
-            _ => ClientClass::new(pnext as usize, module),
+            _ => ClientClass::new(cc.next as usize, module),
         };
 
         Some(Box::new(ClientClass {
             name: name.to_string(),
             table: table,
             next: next,
-            id: id,
+            id: cc.id,
         }))
     }
 }
 
 impl RecvTable {
-    // pProps, numProps, pName
-    named!(pub parse <(u32, u32, u32)>,
-        do_parse!(
-            props    : le_u32 >>
-            numprops : le_u32 >>
-            take!(0x4)        >>
-            name     : le_u32 >>
-            ( (props, numprops, name) )
-        )
-    );
-
     pub fn new(base: usize, module: &Module) -> Option<Self> {
         if base == 0 {
             return None;
         }
 
         trace!("Starting to parse RecvTable at {:#X}", base);
-        let (props, numprops, pname) = RecvTable::parse(module.get_slice(base, 0x10, false)?)
-            .ok()?
-            .1;
-        trace!(
-            "RecvTable at {:#X} => name {:#X}, props {:#X}, numprops {:#X}",
-            base,
-            pname,
-            props,
-            numprops
-        );
-        let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
-            .ok()?
-            .1;
+        let table = zero::read::<_RecvTable>(module.get_slice(base, 0x10, false)?);
+        trace!("{}", table);
+        let name = zero::read_str(module.get(table.name as usize, false)?);
         trace!("RecvTable at {:#X} => {}", base, name);
 
         let mut vec_props = vec![];
-        for i in 0..numprops {
-            let prop_base = (props + i * 0x3C) as usize;
+        for i in 0..table.numprops {
+            let prop_base = (table.props + i * 0x3C) as usize;
             if let Some(prop) = RecvProp::new(prop_base, module) {
                 vec_props.push(prop)
             }
@@ -145,45 +160,23 @@ impl RecvTable {
 }
 
 impl RecvProp {
-    // pname, ptable, offset
-    named!(pub parse <(u32, u32, i32)>,
-        do_parse!(
-            name        : le_u32 >>
-            take!(0x24)          >>
-            table       : le_u32 >>
-            offset      : le_i32 >>
-            take!(0xC)           >>
-            ( (name, table, offset) )
-        )
-    );
-
     pub fn new(base: usize, module: &Module) -> Option<Self> {
         if base == 0 {
             return None;
         }
 
         trace!("Starting to parse RecvProp at {:#X}", base);
-        let (pname, ptable, offset) = RecvProp::parse(module.get_slice(base, 0x3C, false)?)
-            .ok()?
-            .1;
-        trace!(
-            "RecvProp at {:#X} => name {:#X}, table {:#X}, offset {:#X}",
-            base,
-            pname,
-            ptable,
-            offset
-        );
-        let name = parse_cstring(module.get_slice(pname as usize, 0x80, false)?)
-            .ok()?
-            .1;
+        let prop = zero::read::<_RecvProp>(module.get_slice(base, 0x30, false)?);
+        trace!("{}", prop);
+        let name = zero::read_str(module.get(prop.name as usize, false)?);
         trace!("RecvProp at {:#X} => {}", base, name);
 
-        let table = RecvTable::new(ptable as usize, module);
+        let table = RecvTable::new(prop.table as usize, module);
 
         Some(RecvProp {
             name: name.to_string(),
             table: table,
-            offset: offset,
+            offset: prop.offset,
         })
     }
 

@@ -46,8 +46,8 @@ impl Module {
         findpattern::find_pattern(&self.data, pattern)
     }
 
-    // o: Offset
-    // is_relative: Base has already been subtracted.
+    /// o: Offset
+    /// is_relative: Base has already been subtracted.
     pub fn get_raw<T: Copy>(&self, mut o: usize, is_relative: bool) -> Option<T> {
         if !is_relative {
             o -= self.base;
@@ -60,12 +60,20 @@ impl Module {
         Some(raw)
     }
 
-    // is_relative: if true, the base has already been subtracted.
+    /// is_relative: if true, the base has already been subtracted.
     pub fn get_slice(&self, mut offset: usize, len: usize, is_relative: bool) -> Option<&[u8]> {
         if !is_relative {
             offset = offset.wrapping_sub(self.base);
         }
         self.data.get(offset..(offset + len))
+    }
+
+    /// is_relative: if true, the base has already been subtracted.
+    pub fn get(&self, mut offset: usize, is_relative: bool) -> Option<&[u8]> {
+        if !is_relative {
+            offset = offset.wrapping_sub(self.base);
+        }
+        self.data.get(offset..)
     }
 }
 

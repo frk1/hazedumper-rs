@@ -4,7 +4,8 @@ use self::winapi::um::handleapi::{CloseHandle, INVALID_HANDLE_VALUE};
 use self::winapi::um::tlhelp32::CreateToolhelp32Snapshot;
 use std::ops::Deref;
 
-/// Wrapper around the windows `HANDLE` returned from `kernel32::CreateToolhelp32Snapshot`.
+/// Wrapper around the windows `HANDLE` returned from
+/// `kernel32::CreateToolhelp32Snapshot`.
 pub struct SnapshotHandle {
     pub handle: HANDLE,
 }

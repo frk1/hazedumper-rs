@@ -21,10 +21,10 @@ log = "0.4.1"
 simplelog = "0.4.4"
 failure = "0.1.1"
 regex = "0.2.5"
-nom = "4.0.0-alpha2"
 chrono = { version = "0.4", features = ["serde"] }
 serde_yaml = "0.7.3"
 toml = "0.4.5"
+zero = "0.1.2"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt", "wow64apiset"] }
