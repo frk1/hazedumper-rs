@@ -27,8 +27,11 @@ use structopt::StructOpt;
 type Map<T> = BTreeMap<String, T>;
 
 #[derive(StructOpt, Debug)]
-#[structopt(name = "hazedumper", about = "Signature scanning for every game!",
-            author = "frk <hazefrk+dev@gmail.com>")]
+#[structopt(
+    name = "hazedumper",
+    about = "Signature scanning for every game!",
+    author = "frk <hazefrk+dev@gmail.com>"
+)]
 struct Opt {
     /// A flag, true if used in the command line.
     #[structopt(short = "v", help = "Activate verbose mode")]
@@ -39,8 +42,9 @@ struct Opt {
     silent: bool,
 
     /// Optional parameter, the config file.
-    #[structopt(short = "c", long = "config",
-                help = "Path to the config file (default: config.json)")]
+    #[structopt(
+        short = "c", long = "config", help = "Path to the config file (default: config.json)"
+    )]
     config: Option<String>,
 
     /// Optional parameter, the config file.
@@ -54,7 +58,7 @@ struct Opt {
 
 fn main() {
     let app = Opt::clap().version(env!("GIT_PKG_VERSION_SEMVER"));
-    let opt = Opt::from_clap(app.get_matches());
+    let opt = Opt::from_clap(&app.get_matches());
     if !opt.silent {
         setup_log(opt.verbose);
     }
@@ -84,7 +88,7 @@ fn main() {
 
 /// Setup log levels for terminal and file.
 fn setup_log(v: u64) -> () {
-    use LogLevelFilter::{Debug, Info, Trace};
+    use LevelFilter::{Debug, Info, Trace};
     let (level_term, level_file) = match v {
         0 => (Info, Info),
         1 => (Debug, Debug),

@@ -4,7 +4,8 @@ use std::fs::File;
 
 #[derive(Debug, Serialize, Deserialize, Fail)]
 pub enum ConfigError {
-    #[fail(display = "Could not load config from file")] LoadingFromFile,
+    #[fail(display = "Could not load config from file")]
+    LoadingFromFile,
 }
 
 pub type Result<T> = ::std::result::Result<T, ConfigError>;

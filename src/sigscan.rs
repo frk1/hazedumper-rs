@@ -6,13 +6,17 @@ pub type Result<T> = ::std::result::Result<T, ScanError>;
 
 #[derive(Debug, Fail)]
 pub enum ScanError {
-    #[fail(display = "Module not found")] ModuleNotFound,
+    #[fail(display = "Module not found")]
+    ModuleNotFound,
 
-    #[fail(display = "Pattern not found")] PatternNotFound,
+    #[fail(display = "Pattern not found")]
+    PatternNotFound,
 
-    #[fail(display = "Offset out of module bounds")] OffsetOutOfBounds,
+    #[fail(display = "Offset out of module bounds")]
+    OffsetOutOfBounds,
 
-    #[fail(display = "rip_relative failed")] RIPRelativeFailed,
+    #[fail(display = "rip_relative failed")]
+    RIPRelativeFailed,
 }
 
 pub fn find_signature(sig: &Signature, process: &Process) -> Result<usize> {

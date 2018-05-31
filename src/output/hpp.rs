@@ -62,6 +62,6 @@ impl<'a> Dumper<'a> {
     /// Create new instance.
     pub fn new(res: &'a Results, name: &str) -> io::Result<Self> {
         let f = File::create(format!("{}.hpp", name))?;
-        Ok(Dumper { res: res, file: f })
+        Ok(Dumper { res, file: f })
     }
 }

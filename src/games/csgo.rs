@@ -116,8 +116,8 @@ impl ClientClass {
 
         Some(Box::new(ClientClass {
             name: name.to_string(),
-            table: table,
-            next: next,
+            table,
+            next,
             id: cc.id,
         }))
     }
@@ -175,7 +175,7 @@ impl RecvProp {
 
         Some(RecvProp {
             name: name.to_string(),
-            table: table,
+            table,
             offset: prop.offset,
         })
     }

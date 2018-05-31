@@ -1,9 +1,9 @@
 extern crate winapi;
 
-use std::{mem, ptr};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::{mem, ptr};
 
 use self::winapi::shared::basetsd::SIZE_T;
 use self::winapi::shared::minwindef::{BOOL, FALSE, LPCVOID, LPVOID, PBOOL};
@@ -11,10 +11,12 @@ use self::winapi::shared::ntdef::HANDLE;
 use self::winapi::um::handleapi::CloseHandle;
 use self::winapi::um::memoryapi::{ReadProcessMemory, WriteProcessMemory};
 use self::winapi::um::processthreadsapi::OpenProcess;
-use self::winapi::um::tlhelp32::{PROCESSENTRY32W,
-                                 Process32FirstW,
-                                 Process32NextW,
-                                 TH32CS_SNAPPROCESS};
+use self::winapi::um::tlhelp32::{
+    PROCESSENTRY32W,
+    Process32FirstW,
+    Process32NextW,
+    TH32CS_SNAPPROCESS,
+};
 use self::winapi::um::winnt::PROCESS_ALL_ACCESS;
 use self::winapi::um::wow64apiset::IsWow64Process;
 use memlib::*;
@@ -128,8 +130,8 @@ pub fn from_pid(pid: u32) -> Option<Process> {
 
     Some(Process {
         id: pid,
-        is_wow64: is_wow64,
-        handle: handle,
+        is_wow64,
+        handle,
         modules: RefCell::new(HashMap::new()),
     })
 }

@@ -1,11 +1,13 @@
 extern crate winapi;
 
 use self::winapi::shared::minwindef::FALSE;
-use self::winapi::um::tlhelp32::{MODULEENTRY32W,
-                                 Module32FirstW,
-                                 Module32NextW,
-                                 TH32CS_SNAPMODULE,
-                                 TH32CS_SNAPMODULE32};
+use self::winapi::um::tlhelp32::{
+    MODULEENTRY32W,
+    Module32FirstW,
+    Module32NextW,
+    TH32CS_SNAPMODULE,
+    TH32CS_SNAPMODULE32,
+};
 use memlib::*;
 use std::mem;
 
