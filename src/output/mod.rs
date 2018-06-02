@@ -6,6 +6,7 @@ extern crate toml;
 mod csharp;
 mod hpp;
 mod vbnet;
+mod rust;
 
 use self::chrono::prelude::*;
 use self::chrono::serde::ts_seconds;
@@ -73,9 +74,11 @@ impl Results {
         let mut out_hpp = hpp::Dumper::new(self, filename)?;
         let mut out_csharp = csharp::Dumper::new(self, filename)?;
         let mut out_vbnet = vbnet::Dumper::new(self, filename)?;
+        let mut out_rust = rust::Dumper::new(self, filename)?;
         out_hpp.dump()?;
         out_csharp.dump()?;
         out_vbnet.dump()?;
+        out_rust.dump()?;
 
         Ok(())
     }
