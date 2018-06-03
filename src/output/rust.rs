@@ -21,7 +21,7 @@ impl<'a> Dumpable for Dumper<'a> {
 
     /// Write the header.
     fn header(&mut self) -> io::Result<()> {
-        writeln!(&mut self.file, "#![allow(warnings)]")?;
+        writeln!(&mut self.file, "#![allow(warnings)]\n")?;
         writeln!(&mut self.file, "// {}\n", self.res.timestamp)?;
         Ok(())
     }
