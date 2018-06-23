@@ -24,7 +24,7 @@ regex = "1.0.1"
 chrono = { version = "0.4.3", features = ["serde"] }
 serde_yaml = "0.7.5"
 toml = "0.4.6"
-zero = "0.1.2"
+nom = "4.0.0"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3.5", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt", "wow64apiset"] }

@@ -20,44 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extern crate winapi;
-use self::winapi::shared::ntdef::HANDLE;
-use self::winapi::um::handleapi::{CloseHandle, INVALID_HANDLE_VALUE};
-use self::winapi::um::tlhelp32::CreateToolhelp32Snapshot;
-use std::ops::Deref;
+#![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
 
-/// Wrapper around the windows `HANDLE` returned from
-/// `kernel32::CreateToolhelp32Snapshot`.
-pub struct SnapshotHandle {
-    pub handle: HANDLE,
+use memlib::Process;
+use std::collections::BTreeMap;
+
+use games::csgo;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct NetvarManager {
+    tables: BTreeMap<String, csgo::RecvTable>,
 }
 
-impl SnapshotHandle {
-    /// Constructs a new `SnapshotHandle`.
-    ///
-    /// Calls the `kernel32::CreateToolhelp32Snapshot` windows api.
-    pub fn new(pid: u32, flags: u32) -> Option<Self> {
-        let handle = unsafe { CreateToolhelp32Snapshot(flags, pid) };
-        if handle.is_null() || handle == INVALID_HANDLE_VALUE {
-            return None;
-        }
+impl NetvarManager {
+    pub fn new(first: usize, process: &Process) -> Option<Self> {
+        let module = process.get_module("client.dll")?;
+        debug!("First ClientClass at {:#X}", first);
 
-        Some(SnapshotHandle { handle })
+        let classes = csgo::ClientClassIterator::new(first + module.base, &module);
+        let tables = classes
+            .map(|c| (c.table.name.clone(), c.table))
+            .collect::<BTreeMap<_, _>>();
+        debug!("Added {} parent RecvTables!", tables.len());
+        Some(NetvarManager { tables })
     }
-}
 
-impl Drop for SnapshotHandle {
-    fn drop(&mut self) {
-        unsafe {
-            CloseHandle(self.handle);
-        }
-    }
-}
-
-impl Deref for SnapshotHandle {
-    type Target = HANDLE;
-
-    fn deref(&self) -> &HANDLE {
-        &self.handle
+    pub fn get_offset(&self, table_name: &str, netvar_name: &str) -> Option<i32> {
+        self.tables.get(table_name)?.get_offset(netvar_name)
     }
 }
