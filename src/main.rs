@@ -34,17 +34,15 @@ type Map<T> = BTreeMap<String, T>;
 )]
 struct Opt {
     /// A flag, true if used in the command line.
-    #[structopt(short = "v", help = "Activate verbose mode")]
-    verbose: u64,
+    #[structopt(short = "v", help = "Vverbose mode", parse(from_occurrences))]
+    verbose: u8,
 
     /// A flag, true if used in the command line.
-    #[structopt(short = "s", long = "silent", help = "Silence output")]
+    #[structopt(short = "s", long = "silent")]
     silent: bool,
 
     /// Optional parameter, the config file.
-    #[structopt(
-        short = "c", long = "config", help = "Path to the config file (default: config.json)"
-    )]
+    #[structopt(short = "c", long = "config", help = "Config file [config.json]")]
     config: Option<String>,
 
     /// Optional parameter, the config file.
@@ -52,7 +50,7 @@ struct Opt {
     filename: Option<String>,
 
     /// Optional parameter, overrides the target executable.
-    #[structopt(short = "t", long = "target", help = "Target executable")]
+    #[structopt(short = "t", long = "target", help = "Process name")]
     target: Option<String>,
 }
 
@@ -87,7 +85,7 @@ fn main() {
 }
 
 /// Setup log levels for terminal and file.
-fn setup_log(v: u64) -> () {
+fn setup_log(v: u8) -> () {
     use LevelFilter::{Debug, Info, Trace};
     let (level_term, level_file) = match v {
         0 => (Info, Info),
