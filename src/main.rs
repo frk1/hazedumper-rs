@@ -107,7 +107,7 @@ fn main() {
     };
 
     let results = output::Results::new(sigs, netvars);
-    let filename = opt.filename.unwrap_or_else(|| "csgo".to_string());
+    let filename = opt.filename.unwrap_or(conf.filename);
     results.dump_all(&filename).expect("Dump results");
 }
 
