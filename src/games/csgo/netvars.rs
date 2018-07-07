@@ -34,7 +34,9 @@ pub struct NetvarManager {
 
 impl NetvarManager {
     pub fn new(first: usize, process: &Process) -> Option<Self> {
-        let module = process.get_module("client.dll").or_else(|| process.get_module("client_panorama.dll"))?;
+        let module = process
+            .get_module("client.dll")
+            .or_else(|| process.get_module("client_panorama.dll"))?;
         debug!("First ClientClass at {:#X}", first);
 
         let classes = csgo::ClientClassIterator::new(first + module.base, &module);

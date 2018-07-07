@@ -69,7 +69,11 @@ struct Opt {
     silent: bool,
 
     /// Optional parameter, the config file.
-    #[structopt(short = "c", long = "config", help = "Config file [config.json]")]
+    #[structopt(
+        short = "c",
+        long = "config",
+        help = "Config file [config.json]"
+    )]
     config: Option<String>,
 
     /// Optional parameter, the config file.
