@@ -63,7 +63,8 @@ impl ClientClass {
     fn parse(base: usize, module: &Module) -> Option<(ClientClass, usize)> {
         debug!("Starting to parse ClientClass at {:#x}", base);
         let data = module.get_slice(base, 0x18, false)?;
-        let (_, (offset_name, offset_table, offset_next, id)) = ClientClass::parse_raw(&data).ok()?;
+        let (_, (offset_name, offset_table, offset_next, id)) =
+            ClientClass::parse_raw(&data).ok()?;
 
         let name = ::helpers::parse_string(module.get(offset_name, false)?)
             .ok()?

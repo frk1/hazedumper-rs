@@ -35,6 +35,7 @@ impl<'a> Dumpable for Dumper<'a> {
     fn dump(&mut self) -> io::Result<()> {
         self.header()?;
         writeln!(&mut self.file, "namespace hazedumper\n{{")?;
+        self.timestamp()?;
         self.netvars()?;
         self.signatures()?;
         writeln!(&mut self.file, "}} // namespace hazedumper")?;
@@ -46,6 +47,15 @@ impl<'a> Dumpable for Dumper<'a> {
         writeln!(&mut self.file, "using System;\n")?;
         writeln!(&mut self.file, "// {}\n", self.res.timestamp)?;
         Ok(())
+    }
+
+    /// Write the timestamp.
+    fn timestamp(&mut self) -> io::Result<()> {
+        writeln!(
+            &mut self.file,
+            "    public const Int32 timestamp = {};",
+            self.res.timestamp.timestamp()
+        )
     }
 
     /// Write the netvars.

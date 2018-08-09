@@ -35,10 +35,20 @@ impl<'a> Dumpable for Dumper<'a> {
     fn dump(&mut self) -> io::Result<()> {
         self.header()?;
         writeln!(&mut self.file, "Namespace hazedumper")?;
+        self.timestamp()?;
         self.netvars()?;
         self.signatures()?;
         writeln!(&mut self.file, "End Namespace")?;
         Ok(())
+    }
+
+    /// Write the timestamp.
+    fn timestamp(&mut self) -> io::Result<()> {
+        writeln!(
+            &mut self.file,
+            "    Public Const timestamp as Integer = &H{:X}",
+            self.res.timestamp.timestamp()
+        )
     }
 
     /// Write the header.

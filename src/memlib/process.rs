@@ -34,9 +34,9 @@ use self::winapi::um::handleapi::CloseHandle;
 use self::winapi::um::memoryapi::{ReadProcessMemory, WriteProcessMemory};
 use self::winapi::um::processthreadsapi::OpenProcess;
 use self::winapi::um::tlhelp32::{
-    PROCESSENTRY32W,
     Process32FirstW,
     Process32NextW,
+    PROCESSENTRY32W,
     TH32CS_SNAPPROCESS,
 };
 use self::winapi::um::winnt::PROCESS_ALL_ACCESS;

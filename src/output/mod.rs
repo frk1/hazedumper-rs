@@ -63,6 +63,9 @@ trait Dumpable {
     /// Write the header.
     fn header(&mut self) -> io::Result<()>;
 
+    /// Write the timestamp.
+    fn timestamp(&mut self) -> io::Result<()>;
+
     /// Write the netvars.
     fn netvars(&mut self) -> io::Result<()>;
 

@@ -101,8 +101,7 @@ fn main() {
         .ok_or_else(|| {
             error!("Could not open process {}!", conf.executable);
             exit(1);
-        })
-        .unwrap();
+        }).unwrap();
 
     let sigs = scan_signatures(&conf, &process);
     let netvars = match conf.executable.as_ref() {
