@@ -29,12 +29,11 @@ extern crate log;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
-extern crate structopt_derive;
-#[macro_use]
 extern crate nom;
 
 extern crate simplelog;
 extern crate structopt;
+extern crate structopt_derive;
 
 mod config;
 mod games;
@@ -47,7 +46,7 @@ use std::collections::BTreeMap;
 use std::fs::OpenOptions;
 use std::process::exit;
 
-use config::Config;
+use crate::config::Config;
 use simplelog::*;
 use structopt::StructOpt;
 
@@ -69,11 +68,7 @@ struct Opt {
     silent: bool,
 
     /// Optional parameter, the config file.
-    #[structopt(
-        short = "c",
-        long = "config",
-        help = "Config file [config.json]"
-    )]
+    #[structopt(short = "c", long = "config", help = "Config file [config.json]")]
     config: Option<String>,
 
     /// Optional parameter, the config file.
@@ -101,7 +96,8 @@ fn main() {
         .ok_or_else(|| {
             error!("Could not open process {}!", conf.executable);
             exit(1);
-        }).unwrap();
+        })
+        .unwrap();
 
     let sigs = scan_signatures(&conf, &process);
     let netvars = match conf.executable.as_ref() {
@@ -116,7 +112,7 @@ fn main() {
 
 /// Setup log levels for terminal and file.
 fn setup_log(v: u8) -> () {
-    use LevelFilter::{Debug, Info, Trace};
+    use crate::LevelFilter::{Debug, Info, Trace};
     let (level_term, level_file) = match v {
         0 => (Info, Info),
         1 => (Debug, Debug),
@@ -131,7 +127,8 @@ fn setup_log(v: u8) -> () {
     CombinedLogger::init(vec![
         TermLogger::new(level_term, simplelog::Config::default()).unwrap(),
         WriteLogger::new(level_file, simplelog::Config::default(), logfile.unwrap()),
-    ]).unwrap();
+    ])
+    .unwrap();
 }
 
 /// Scan the signatures from the config and return a `Map<usize>`.

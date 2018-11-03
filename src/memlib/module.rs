@@ -30,7 +30,7 @@ use self::winapi::um::tlhelp32::{
     TH32CS_SNAPMODULE,
     TH32CS_SNAPMODULE32,
 };
-use memlib::*;
+use crate::memlib::*;
 use std::mem;
 
 #[derive(Debug, Clone)]

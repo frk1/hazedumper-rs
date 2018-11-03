@@ -41,7 +41,7 @@ use self::winapi::um::tlhelp32::{
 };
 use self::winapi::um::winnt::PROCESS_ALL_ACCESS;
 use self::winapi::um::wow64apiset::IsWow64Process;
-use memlib::*;
+use crate::memlib::*;
 
 impl Constructor for PROCESSENTRY32W {
     /// Create a new instance of `PROCESSENTRY32W`

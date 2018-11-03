@@ -22,7 +22,7 @@
 
 #![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
 
-use memlib::Module;
+use crate::memlib::Module;
 use nom::*;
 use std::str;
 
@@ -61,7 +61,7 @@ impl RecvTable {
         let data = module.get_slice(base, 0x10, false)?;
         let (_, (offset_name, offset_props, num_props)) = Self::parse_raw(&data).ok()?;
 
-        let name = ::helpers::parse_string(module.get(offset_name, false)?)
+        let name = crate::helpers::parse_string(module.get(offset_name, false)?)
             .ok()?
             .1
             .to_string();

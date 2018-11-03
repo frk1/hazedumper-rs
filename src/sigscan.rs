@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use config::Signature;
-use memlib::Process;
+use crate::config::Signature;
+use crate::memlib::Process;
 use std::mem;
 
 pub type Result<T> = ::std::result::Result<T, ScanError>;

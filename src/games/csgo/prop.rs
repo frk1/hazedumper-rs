@@ -22,11 +22,11 @@
 
 #![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
 
-use memlib::Module;
+use crate::memlib::Module;
 use nom::*;
 use std::str;
 
-use games::csgo::table::RecvTable;
+use crate::games::csgo::table::RecvTable;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RecvProp {
@@ -66,7 +66,7 @@ impl RecvProp {
         let data = module.get_slice(base, 0x30, false)?;
         let (_, (offset_name, offset_table, value)) = RecvProp::parse_raw(&data).ok()?;
 
-        let name = ::helpers::parse_string(module.get(offset_name, false)?)
+        let name = crate::helpers::parse_string(module.get(offset_name, false)?)
             .ok()?
             .1
             .to_string();

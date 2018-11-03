@@ -32,7 +32,8 @@ pub fn generate_regex(raw: &str) -> Option<Regex> {
         .map(|x| match &x {
             &"?" => ".".to_string(),
             x => format!("\\x{}", x),
-        }).collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>()
         .join("");
     res.insert_str(0, "(?s-u)");
     Regex::new(&res).ok()

@@ -22,10 +22,10 @@
 
 #![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
 
-use memlib::Module;
+use crate::memlib::Module;
 use nom::*;
 
-use games::csgo::table::RecvTable;
+use crate::games::csgo::table::RecvTable;
 
 #[derive(Debug, PartialEq)]
 pub struct ClientClass {
@@ -66,7 +66,7 @@ impl ClientClass {
         let (_, (offset_name, offset_table, offset_next, id)) =
             ClientClass::parse_raw(&data).ok()?;
 
-        let name = ::helpers::parse_string(module.get(offset_name, false)?)
+        let name = crate::helpers::parse_string(module.get(offset_name, false)?)
             .ok()?
             .1
             .to_string();

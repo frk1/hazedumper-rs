@@ -22,10 +22,10 @@
 
 #![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
 
-use memlib::Process;
+use crate::memlib::Process;
 use std::collections::BTreeMap;
 
-use games::csgo;
+use crate::games::csgo;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetvarManager {
