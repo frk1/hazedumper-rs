@@ -111,7 +111,7 @@ fn main() {
 }
 
 /// Setup log levels for terminal and file.
-fn setup_log(v: u8) -> () {
+fn setup_log(v: u8) {
     use crate::LevelFilter::{Debug, Info, Trace};
     let (level_term, level_file) = match v {
         0 => (Info, Info),

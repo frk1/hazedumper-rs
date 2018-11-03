@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#![cfg_attr(feature = "cargo-clippy", allow(double_parens))]
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::double_parens))]
 
 use crate::memlib::Process;
 use std::collections::BTreeMap;
