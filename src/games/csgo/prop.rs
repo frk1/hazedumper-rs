@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#![cfg_attr(feature = "cargo-clippy", allow(clippy::double_parens))]
+#![allow(clippy::double_parens)]
 
 use crate::memlib::Module;
 use nom::*;
@@ -45,7 +45,7 @@ pub struct RecvPropIterator<'a> {
 
 impl RecvProp {
     // offset_name, offset_table, value
-    #[cfg_attr(rustfmt, rustfmt_skip)]
+    #[rustfmt::skip]
     named!(
         parse_raw<(usize, usize, i32)>,
         do_parse!(
