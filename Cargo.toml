@@ -32,3 +32,10 @@ winapi = { version = "0.3.6", features = ["basetsd","handleapi","memoryapi","min
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+debug = false
+codegen-units = 1
+panic = "abort"
