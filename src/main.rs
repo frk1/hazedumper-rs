@@ -125,7 +125,7 @@ fn setup_log(v: u8) {
         .open("hazedumper.log");
 
     CombinedLogger::init(vec![
-        TermLogger::new(level_term, simplelog::Config::default()).unwrap(),
+        TermLogger::new(level_term, simplelog::Config::default(), TerminalMode::Mixed).unwrap(),
         WriteLogger::new(level_file, simplelog::Config::default(), logfile.unwrap()),
     ])
     .unwrap();
