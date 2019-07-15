@@ -12,17 +12,17 @@ OriginalFilename = "hazedumper.exe"
 LegalCopyright = "MIT-License"
 
 [dependencies]
-serde = "1.0.92"
-serde_json = "1.0.39"
-serde_derive = "1.0.92"
-structopt = "0.2.16"
-structopt-derive = "0.2.16"
+serde = "1.0.94"
+serde_json = "1.0.40"
+serde_derive = "1.0.94"
+structopt = "0.2.18"
+structopt-derive = "0.2.18"
 winapi = "0.3.7"
-log = "0.4.6"
+log = "0.4.7"
 simplelog = "0.6.0"
 failure = "0.1.5"
-regex = "1.1.7"
-chrono = { version = "0.4.6", features = ["serde"] }
+regex = "1.1.9"
+chrono = { version = "0.4.7", features = ["serde"] }
 serde_yaml = "0.8.9"
 toml = "0.5.1"
 nom = "4.2.3"
@@ -31,7 +31,7 @@ nom = "4.2.3"
 winapi = { version = "0.3.7", features = ["basetsd","handleapi","memoryapi","minwindef","ntdef","processthreadsapi","tlhelp32","winnt", "wow64apiset"] }
 
 [target.'cfg(windows)'.build-dependencies]
-winres = "0.1.10"
+winres = "0.1.11"
 
 [profile.release]
 opt-level = 3
