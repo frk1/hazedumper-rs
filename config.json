@@ -48,9 +48,9 @@
       "relative": false,
       "module": "engine.dll",
       "offsets": [
-        1
+        7
       ],
-      "pattern": "05 ? ? ? ? C3 CC CC CC CC CC CC CC 80 3D"
+      "pattern": "B8 ? ? ? ? C3 05 ? ? ? ? C3"
     },
     {
       "name": "dwClientState_MaxPlayer",
@@ -230,7 +230,7 @@
       "offsets": [
         1
       ],
-      "pattern": "A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 0F 84 ? ? ? ? 0F 10 05"
+      "pattern": "A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 74 7A"
     },
     {
       "name": "dwGetAllClasses",
@@ -524,6 +524,33 @@
       "relative": true,
       "module": "client_panorama.dll",
       "pattern": "74 07 8B CB E8 ? ? ? ? 83 C7 10"
+    },
+    {
+      "name": "anim_overlays",
+      "extra": 0,
+      "relative": false,
+      "module": "client_panorama.dll",
+      "offsets": [
+        2
+      ],
+      "pattern": "8B 89 ? ? ? ? 8D 0C D1"
+    },
+    {
+      "name": "m_flSpawnTime",
+      "extra": 0,
+      "relative": false,
+      "module": "client_panorama.dll",
+      "offsets": [
+        2
+      ],
+      "pattern": "89 86 ? ? ? ? E8 ? ? ? ? 80 BE ? ? ? ? ?"
+    },
+    {
+      "name": "find_hud_element",
+      "extra": 0,
+      "relative": false,
+      "module": "client_panorama.dll",
+      "pattern": "55 8B EC 53 8B 5D 08 56 57 8B F9 33 F6 39 77 28"
     }
   ],
   "netvars": [
@@ -931,6 +958,36 @@
       "name": "m_bStartedArming",
       "prop": "m_bStartedArming",
       "table": "DT_WeaponC4"
+    },
+    {
+      "name": "m_bUseCustomBloomScale",
+      "prop": "m_bUseCustomBloomScale",
+      "table": "DT_EnvTonemapController"
+    },
+    {
+      "name": "m_bUseCustomAutoExposureMin",
+      "prop": "m_bUseCustomAutoExposureMin",
+      "table": "DT_EnvTonemapController"
+    },
+    {
+      "name": "m_bUseCustomAutoExposureMax",
+      "prop": "m_bUseCustomAutoExposureMax",
+      "table": "DT_EnvTonemapController"
+    },
+    {
+      "name": "m_flCustomBloomScale",
+      "prop": "m_flCustomBloomScale",
+      "table": "DT_EnvTonemapController"
+    },
+    {
+      "name": "m_flCustomAutoExposureMin",
+      "prop": "m_flCustomAutoExposureMin",
+      "table": "DT_EnvTonemapController"
+    },
+    {
+      "name": "m_flCustomAutoExposureMax",
+      "prop": "m_flCustomAutoExposureMax",
+      "table": "DT_EnvTonemapController"
     }
   ]
 }
