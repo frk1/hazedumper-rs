@@ -512,6 +512,13 @@
       "pattern": "55 8B EC 83 E4 F8 51 53 56 57 8B F1 E8"
     },
     {
+      "name": "set_abs_velocity",
+      "extra": 0,
+      "relative": true,
+      "module": "client_panorama.dll",
+      "pattern": ""55 8B EC 83 E4 F8 83 EC 0C 53 56 57 8B 7D 08 8B F1 F3"
+    },
+    {
       "name": "is_c4_owner",
       "extra": 0,
       "relative": true,
@@ -551,6 +558,13 @@
       "relative": false,
       "module": "client_panorama.dll",
       "pattern": "55 8B EC 53 8B 5D 08 56 57 8B F9 33 F6 39 77 28"
+    },
+    {
+      "name": "find_hud_element",
+      "extra": 0,
+      "relative": false,
+      "module": "client_panorama.dll",
+      "pattern": "E8 ? ? ? ? 83 7D D8 00 7C 0F"
     }
   ],
   "netvars": [
@@ -678,6 +692,11 @@
       "table": "DT_BaseCombatWeapon"
     },
     {
+      "name": "m_flNextSecondaryAttack",
+      "prop": "m_flNextSecondaryAttack",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
       "name": "m_hActiveWeapon",
       "prop": "m_hActiveWeapon",
       "table": "DT_BasePlayer"
@@ -711,6 +730,11 @@
     {
       "name": "m_iClip1",
       "prop": "m_iClip1",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_iClip2",
+      "prop": "m_iClip2",
       "table": "DT_BaseCombatWeapon"
     },
     {
@@ -759,6 +783,11 @@
       "name": "m_iItemDefinitionIndex",
       "prop": "m_iItemDefinitionIndex",
       "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_iItemIDLow",
+      "prop": "m_iItemIDLow",
+      "table": "DT_BaseAttributableItem"
     },
     {
       "name": "m_iItemIDHigh",
@@ -960,6 +989,16 @@
       "table": "DT_WeaponC4"
     },
     {
+      "name": "m_fRoundStartTime",
+      "prop": "m_fRoundStartTime",
+      "table": "DT_CSGameRulesProxy"
+    },
+    {
+      "name": "m_nSurvivalTeam",
+      "prop": "m_nSurvivalTeam",
+      "table": "DT_CSPlayer"
+    },
+    {
       "name": "m_bUseCustomBloomScale",
       "prop": "m_bUseCustomBloomScale",
       "table": "DT_EnvTonemapController"
@@ -988,6 +1027,344 @@
       "name": "m_flCustomAutoExposureMax",
       "prop": "m_flCustomAutoExposureMax",
       "table": "DT_EnvTonemapController"
+    },
+    {
+      "name": "m_bClientSideAnimation",
+      "prop": "m_bClientSideAnimation",
+      "table": "DT_BaseAnimating"
+    },
+    {
+      "name": "m_bHasHeavyArmor",
+      "prop": "m_bHasHeavyArmor",
+      "table": "DT_CSPlayer"
+    },
+    {
+      "name": "m_hConstraintEntity",
+      "prop": "m_hConstraintEntity",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_flPoseParameter",
+      "prop": "m_flPoseParameter",
+      "table": "DT_BaseAnimating"
+    },
+    {
+      "name": "m_flModelScale",
+      "prop": "m_flModelScale",
+      "table": "DT_BaseAnimating"
+    },
+    {
+      "name": "m_bClientSideFrameReset",
+      "prop": "m_bClientSideFrameReset",
+      "table": "DT_BaseAnimating"
+    },
+    {
+      "name": "m_bDrawViewmodel",
+      "prop": "m_bDrawViewmodel",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_angRotation",
+      "prop": "m_angRotation",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_fLastShotTime",
+      "prop": "m_fLastShotTime",
+      "table": "DT_WeaponCSBase"
+    },
+    {
+      "name": "m_iAddonBits",
+      "prop": "m_iAddonBits",
+      "table": "DT_CSPlayer"
+    },
+    {
+      "name": "m_fEffects",
+      "prop": "m_fEffects",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_flDuckAmount",
+      "prop": "m_flDuckAmount",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_nSequence",
+      "prop": "m_nSequence",
+      "table": "DT_BaseAnimating"
+    },
+    {
+      "name": "m_bSimulatedEveryTick",
+      "prop": "m_bSimulatedEveryTick",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "deadflag",
+      "prop": "deadflag",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_nRenderMode",
+      "prop": "m_nRenderMode",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_zoomLevel",
+      "prop": "m_zoomLevel",
+      "table": "DT_WeaponCSBaseGun"
+    },
+    {
+      "name": "m_flFriction",
+      "prop": "m_flFriction",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_nModelIndex",
+      "prop": "m_nModelIndex",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_hWeaponWorldModel",
+      "prop": "m_hWeaponWorldModel",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_iWorldModelIndex",
+      "prop": "m_iWorldModelIndex",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_vecAngles",
+      "prop": "m_vecAngles",
+      "table": "DT_TEShatterSurface"
+    },
+    {
+      "name": "m_bShouldGlow",
+      "prop": "m_bShouldGlow",
+      "table": "DT_DynamicProp"
+    },
+    {
+      "name": "m_flAnimTime",
+      "prop": "m_flAnimTime",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_bIsAutoaimTarget",
+      "prop": "m_bIsAutoaimTarget",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_iPrimaryAmmoType",
+      "prop": "m_iPrimaryAmmoType",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_iWeaponID",
+      "prop": "m_fAccuracyPenalty",
+      "offset": 44,
+      "table": "DT_WeaponCSBase"
+    },
+    {
+      "name": "m_iKills",
+      "prop": "m_iKills",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_iAssists",
+      "prop": "m_iAssists",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_iDeaths",
+      "prop": "m_iDeaths",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_iPing",
+      "prop": "m_iPing",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_iScore",
+      "prop": "m_iScore",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_szClan",
+      "prop": "m_szClan",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_hLastWeapon",
+      "prop": "m_hLastWeapon",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_vecPunch",
+      "prop": "m_Local",
+      "offset": 112,
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_iCrossHairID",
+      "prop": "m_bHasDefuser",
+      "offset": 92,
+      "table": "DT_CSPlayer"
+    },
+    {
+      "name": "m_vecMins",
+      "prop": "m_vecMins",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_vecMaxs",
+      "prop": "m_vecMaxs",
+      "table": "DT_BaseEntity"
+    },
+    {
+      "name": "m_bBombTicking",
+      "prop": "m_bBombTicking",
+      "table": "DT_PlantedC4"
+    },
+    {
+      "name": "m_bBombDefused",
+      "prop": "m_bBombDefused",
+      "table": "DT_PlantedC4"
+    },
+    {
+      "name": "m_hBombDefuser",
+      "prop": "m_hBombDefuser",
+      "table": "DT_PlantedC4"
+    },
+    {
+      "name": "m_nBombSite",
+      "prop": "m_nBombSite",
+      "table": "DT_PlantedC4"
+    },
+    {
+      "name": "m_bInitialized",
+      "prop": "m_bInitialized",
+      "table": "DT_BaseAttributableItem"
+    },
+    {
+      "name": "m_iEntityLevel",
+      "prop": "m_iEntityLevel",
+      "table": "DT_BaseAttributableItem"
+    },
+    {
+      "name": "m_iPrimaryReserveAmmoCount",
+      "prop": "m_iPrimaryReserveAmmoCount",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_flRecoilIndex",
+      "prop": "m_flRecoilIndex",
+      "table": "DT_WeaponCSBase"
+    },
+    {
+      "name": "m_iViewModelIndex",
+      "prop": "m_iViewModelIndex",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_iWorldDroppedModelIndex",
+      "prop": "m_iWorldDroppedModelIndex",
+      "table": "DT_BaseCombatWeapon"
+    },
+    {
+      "name": "m_bPinPulled",
+      "prop": "m_bPinPulled",
+      "table": "DT_BaseCSGrenade"
+    },
+    {
+      "name": "m_fThrowTime",
+      "prop": "m_fThrowTime",
+      "table": "DT_BaseCSGrenade"
+    },
+    {
+      "name": "m_flThrowStrength",
+      "prop": "m_flThrowStrength",
+      "table": "DT_BaseCSGrenade"
+    },
+    {
+      "name": "m_flPostponeFireReadyTime",
+      "prop": "m_flPostponeFireReadyTime",
+      "table": "DT_WeaponCSBase"
+    },
+    {
+      "name": "m_hViewModel",
+      "prop": "m_hViewModel[0]",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_flMaxspeed",
+      "prop": "m_flMaxspeed",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_nHitboxSet",
+      "prop": "m_nHitboxSet",
+      "table": "DT_BaseAnimating"
+    },
+    {
+      "name": "m_iAccount",
+      "prop": "m_iAccount",
+      "table": "DT_CSPlayer"
+    },
+    {
+      "name": "m_iDefaultFOV",
+      "prop": "m_iDefaultFOV",
+      "table": "DT_BasePlayer"
+    },
+    {
+      "name": "m_flDuckSpeed",
+      "prop": "m_flDuckSpeed",
+      "table": "DT_CSPlayer"
+    },
+    {
+      "name": "m_hMyWearables",
+      "prop": "m_hMyWearables",
+      "table": "DT_CSPlayer"
+    },
+    {
+      "name": "m_nViewModelIndex",
+      "prop": "m_nViewModelIndex",
+      "table": "DT_BaseViewModel"
+    },
+    {
+      "name": "m_hWeapon",
+      "prop": "m_hWeapon",
+      "table": "DT_BaseViewModel"
+    },
+    {
+      "name": "m_iTeam",
+      "prop": "m_iTeam",
+      "table": "DT_PlayerResource"
+    },
+    {
+      "name": "m_nPersonaDataPublicLevel",
+      "prop": "m_nPersonaDataPublicLevel",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_iCompTeammateColor",
+      "prop": "m_iCompTeammateColor",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_nActiveCoinRank",
+      "prop": "m_nActiveCoinRank",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_nMusicID",
+      "prop": "m_nMusicID",
+      "table": "DT_CSPlayerResource"
+    },
+    {
+      "name": "m_iRoundTime",
+      "prop": "m_iRoundTime",
+      "table": "DT_CSGameRulesProxy"
     }
   ]
 }
