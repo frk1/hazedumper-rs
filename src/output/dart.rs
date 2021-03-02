@@ -29,7 +29,7 @@ impl<'a> Dumpable for Dumper<'a> {
     fn timestamp(&mut self) -> io::Result<()> {
         writeln!(
             &mut self.file,
-            "static final int timestamp = {};\n",
+            "final int timestamp = {};\n",
             self.res.timestamp.timestamp()
         )
     }
