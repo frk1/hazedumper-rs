@@ -29,7 +29,7 @@ impl<'a> Dumpable for Dumper<'a> {
     fn timestamp(&mut self) -> io::Result<()> {
         writeln!(
             &mut self.file,
-            "    static final int timestamp = {};",
+            "final int timestamp = {};\n",
             self.res.timestamp.timestamp()
         )
     }
@@ -37,30 +37,30 @@ impl<'a> Dumpable for Dumper<'a> {
     /// Write the netvars.
     fn netvars(&mut self) -> io::Result<()> {
         if let Some(ref netvars) = self.res.netvars {
-            writeln!(&mut self.file, "    class netvars {{")?;
+            writeln!(&mut self.file, "class netvars {{")?;
             for (k, v) in netvars {
                 writeln!(
                     &mut self.file,
-                    "        static final int {} = {:#X};",
+                    "    static final int {} = {:#X};",
                     k, v
                 )?;
             }
-            writeln!(&mut self.file, "    }}")?;
+            writeln!(&mut self.file, "}}")?;
         }
         Ok(())
     }
 
     /// Write the signatures.
     fn signatures(&mut self) -> io::Result<()> {
-        writeln!(&mut self.file, "    class signatures {{")?;
+        writeln!(&mut self.file, "class signatures {{")?;
         for (k, v) in &self.res.signatures {
             writeln!(
                 &mut self.file,
-                "        static final int {} = {:#X};",
+                "    static final int {} = {:#X};",
                 k, v
             )?;
         }
-        writeln!(&mut self.file, "    }}")?;
+        writeln!(&mut self.file, "}}")?;
         Ok(())
     }
 }
