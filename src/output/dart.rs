@@ -12,7 +12,7 @@ pub struct Dumper<'a> {
 impl<'a> Dumpable for Dumper<'a> {
     fn dump(&mut self) -> io::Result<()> {
         self.header()?;
-        writeln!(&mut self.file, "library hazedumper\n")?;
+        writeln!(&mut self.file, "library hazedumper;\n")?;
         self.timestamp()?;
         self.netvars()?;
         self.signatures()?;
@@ -29,7 +29,7 @@ impl<'a> Dumpable for Dumper<'a> {
     fn timestamp(&mut self) -> io::Result<()> {
         writeln!(
             &mut self.file,
-            "final int timestamp = {};\n",
+            "static final int timestamp = {};\n",
             self.res.timestamp.timestamp()
         )
     }
