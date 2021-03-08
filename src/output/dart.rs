@@ -29,7 +29,7 @@ impl<'a> Dumpable for Dumper<'a> {
     fn timestamp(&mut self) -> io::Result<()> {
         writeln!(
             &mut self.file,
-            "final int timestamp = {};\n",
+            "const int timestamp = {};\n",
             self.res.timestamp.timestamp()
         )
     }
@@ -41,7 +41,7 @@ impl<'a> Dumpable for Dumper<'a> {
             for (k, v) in netvars {
                 writeln!(
                     &mut self.file,
-                    "    static final int {} = {:#X};",
+                    "    static const int {} = {:#X};",
                     k, v
                 )?;
             }
@@ -56,7 +56,7 @@ impl<'a> Dumpable for Dumper<'a> {
         for (k, v) in &self.res.signatures {
             writeln!(
                 &mut self.file,
-                "    static final int {} = {:#X};",
+                "    static const int {} = {:#X};",
                 k, v
             )?;
         }
